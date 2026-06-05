@@ -1,40 +1,69 @@
-/* Estilos minimalistas */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+:root {
+    --bg-color: #121212;
+    --accent-color: #E60012; /* Rojo del logo */
+    --text-color: #FFFFFF;
+    --container-bg: #1A1A1A;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    background-color: #f9f9f9;
+    font-family: 'Oswald', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
-    padding: 20px;
+    overflow-x: hidden;
+}
+
+#canvas-container {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
 }
 
 .container {
     max-width: 800px;
-    margin: 40px auto;
-    background: #fff;
+    margin: 100px auto;
+    background: rgba(26, 26, 26, 0.8);
     padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 2px solid var(--accent-color);
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(10px);
 }
 
-h1 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    color: #000;
+h1 { letter-spacing: 4px; text-shadow: 2px 2px 0px var(--accent-color); }
+
+.hero img {
+    width: 150px;
+    transition: transform 0.5s ease;
+    filter: drop-shadow(0px 0px 10px rgba(230, 0, 18, 0.5));
 }
 
-h2 {
-    font-size: 1.4rem;
-    margin-top: 30px;
-    color: #222;
+.hero img:hover { transform: scale(1.05) rotate(2deg); }
+
+.flow-cta { margin-top: 40px; }
+.glow-border {
+    border: 1px solid var(--accent-color);
+    padding: 20px;
+    animation: glow 2s infinite alternate;
 }
 
-.last-update {
-    font-size: 0.9rem;
-    color: #777;
-    margin-bottom: 40px;
+@keyframes glow {
+    from { box-shadow: 0 0 5px var(--accent-color); }
+    to { box-shadow: 0 0 20px var(--accent-color); }
 }
 
-p {
-    margin-bottom: 15px;
+button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 15px;
 }
+
+.footer-links { margin-top: 50px; }
+.footer-links a { margin: 0 10px; color: #777; text-decoration: none; font-size: 0.9rem; }
