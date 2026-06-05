@@ -2,7 +2,7 @@
 
 :root {
     --bg-color: #121212;
-    --accent-color: #E60012; /* Rojo del logo */
+    --accent-color: #E60012;
     --text-color: #FFFFFF;
     --container-bg: #1A1A1A;
 }
@@ -42,7 +42,6 @@ h1 { letter-spacing: 4px; text-shadow: 2px 2px 0px var(--accent-color); }
 
 .hero img:hover { transform: scale(1.05) rotate(2deg); }
 
-.flow-cta { margin-top: 40px; }
 .glow-border {
     border: 1px solid var(--accent-color);
     padding: 20px;
@@ -64,6 +63,3 @@ button {
     text-transform: uppercase;
     margin-top: 15px;
 }
-
-.footer-links { margin-top: 50px; }
-.footer-links a { margin: 0 10px; color: #777; text-decoration: none; font-size: 0.9rem; }

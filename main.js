@@ -1,12 +1,15 @@
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ alpha: true });
+
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+// Luz ambiental roja para dar ese tono de OWG
 const ambientLight = new THREE.AmbientLight(0xff0000, 0.5);
 scene.add(ambientLight);
 
+// Creamos las cuerdas del ring de forma simple
 const geometry = new THREE.CylinderGeometry(0.02, 0.02, 10);
 const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
 for(let i=0; i<3; i++) {
@@ -18,6 +21,7 @@ for(let i=0; i<3; i++) {
 
 camera.position.z = 5;
 
+// Animación con el "flow" rítmico
 function animate() {
     requestAnimationFrame(animate);
     
