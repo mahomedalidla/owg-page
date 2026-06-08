@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Abriendo OWG…</title>
+  <meta name="robots" content="noindex">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 420px;
+      width: 100%;
+      background: #131316;
+      border: 1px solid #2a2a30;
+      border-radius: 12px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+    .sub {
+      margin: 0 0 20px;
+      color: #ffffff66;
+      font-size: 13px;
+    }
+    #status {
+      margin: 0;
+      color: #ffffffb3;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+    .btn {
+      display: none;
+      margin-top: 20px;
+      padding: 14px 24px;
+      background: #e50914;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-size: 15px;
+    }
+    .hint {
+      display: none;
+      margin: 16px 0 0;
+      color: #ffffff55;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Despliegue: sube la carpeta hosting/ a owg-app.com manteniendo rutas:
+      /auth/callback/index.html  →  https://owg-app.com/auth/callback
+      /.well-known/assetlinks.json
+      /.well-known/apple-app-site-association
+
+    Supabase → Authentication → URL Configuration:
+      Redirect URLs: https://owg-app.com/auth/callback
+  -->
+  <div class="card">
+    <h1>OWG</h1>
+    <p class="sub">Official Wrestling Group</p>
+    <p id="status">Abriendo la app…</p>
+    <a id="open-app" class="btn" href="#">Abrir en OWG</a>
+    <p id="hint" class="hint">
+      Si usas Gmail u otro cliente de correo, a veces hay que tocar el botón manualmente.
+      Asegúrate de tener OWG instalada en este dispositivo.
+    </p>
+  </div>
+  <script>
+    (function () {
+      var suffix = window.location.search + window.location.hash;
+      if (!suffix) {
+        document.getElementById('status').textContent =
+          'Enlace incompleto o expirado. Solicita uno nuevo desde la app.';
+        return;
+      }
+
+      var deepLink = 'owg://auth-callback' + suffix;
+      var openBtn = document.getElementById('open-app');
+      openBtn.href = deepLink;
+
+      function showFallback() {
+        document.getElementById('status').textContent =
+          'Toca el botón para continuar en la app.';
+        openBtn.style.display = 'inline-block';
+        document.getElementById('hint').style.display = 'block';
+      }
+
+      function tryOpen() {
+        var isAndroid = /Android/i.test(navigator.userAgent);
+        if (isAndroid) {
+          var intent =
+            'intent://auth-callback' + suffix +
+            '#Intent;scheme=owg;package=com.owg.app;end';
+          window.location.href = intent;
+          setTimeout(function () {
+            window.location.href = deepLink;
+          }, 600);
+        } else {
+          window.location.href = deepLink;
+        }
+      }
+
+      tryOpen();
+      setTimeout(showFallback, 2500);
+      openBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        tryOpen();
+      });
+    })();
+  </script>
+</body>
+</html>
