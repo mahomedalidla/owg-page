@@ -45,7 +45,7 @@
       font-size: 15px;
     }
     .btn {
-      display: none;
+      display: inline-block;
       margin-top: 20px;
       padding: 14px 24px;
       background: #e50914;
@@ -57,7 +57,6 @@
       font-size: 15px;
     }
     .hint {
-      display: none;
       margin: 16px 0 0;
       color: #ffffff55;
       font-size: 12px;
@@ -66,65 +65,53 @@
   </style>
 </head>
 <body>
-  <!--
-    Despliegue: sube la carpeta hosting/ a owg-app.com manteniendo rutas:
-      /auth/callback/index.html  →  https://owg-app.com/auth/callback
-      /.well-known/assetlinks.json
-      /.well-known/apple-app-site-association
-
-    Supabase → Authentication → URL Configuration:
-      Redirect URLs: https://owg-app.com/auth/callback
-  -->
   <div class="card">
     <h1>OWG</h1>
     <p class="sub">Official Wrestling Group</p>
-    <p id="status">Abriendo la app…</p>
+    <p id="status">Toca el botón para continuar en la app.</p>
     <a id="open-app" class="btn" href="#">Abrir en OWG</a>
-    <p id="hint" class="hint">
-      Si usas Gmail u otro cliente de correo, a veces hay que tocar el botón manualmente.
-      Asegúrate de tener OWG instalada en este dispositivo.
+    <p class="hint">
+      Debes tener OWG instalada en este mismo celular y haber pedido el enlace desde la app.
+      Si ves la Play Store, vuelve aquí y toca el botón rojo (no instales de nuevo).
     </p>
   </div>
   <script>
     (function () {
-      var suffix = window.location.search + window.location.hash;
+      var params = window.location.search;
+      var hash = window.location.hash;
+      var suffix = params + hash;
+
       if (!suffix) {
         document.getElementById('status').textContent =
           'Enlace incompleto o expirado. Solicita uno nuevo desde la app.';
+        document.getElementById('open-app').style.display = 'none';
+        document.querySelector('.hint').textContent =
+          'Ve a Taquilla → ¿Olvidaste tu llave? y pide otro correo.';
         return;
       }
 
       var deepLink = 'owg://auth-callback' + suffix;
+      var fallback = encodeURIComponent(window.location.href);
+      var isAndroid = /Android/i.test(navigator.userAgent);
+
+      // Formato correcto: intent://auth-callback/?code=... (con / antes del ?)
+      var intentLink =
+        'intent://auth-callback/' + (params || '') + hash +
+        '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
+        fallback + ';end';
+
       var openBtn = document.getElementById('open-app');
-      openBtn.href = deepLink;
 
-      function showFallback() {
-        document.getElementById('status').textContent =
-          'Toca el botón para continuar en la app.';
-        openBtn.style.display = 'inline-block';
-        document.getElementById('hint').style.display = 'block';
-      }
+      // En Android el intent abre mejor la app; si falla, vuelve a esta página (no a Play Store).
+      openBtn.href = isAndroid ? intentLink : deepLink;
 
-      function tryOpen() {
-        var isAndroid = /Android/i.test(navigator.userAgent);
-        if (isAndroid) {
-          var intent =
-            'intent://auth-callback' + suffix +
-            '#Intent;scheme=owg;package=com.owg.app;end';
-          window.location.href = intent;
-          setTimeout(function () {
-            window.location.href = deepLink;
-          }, 600);
-        } else {
-          window.location.href = deepLink;
-        }
-      }
-
-      tryOpen();
-      setTimeout(showFallback, 2500);
       openBtn.addEventListener('click', function (e) {
+        if (!isAndroid) return;
         e.preventDefault();
-        tryOpen();
+        window.location.href = intentLink;
+        setTimeout(function () {
+          window.location.href = deepLink;
+        }, 800);
       });
     })();
   </script>
