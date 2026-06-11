@@ -2,28 +2,409 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>OWG | Official Wrestling Group</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWG — La app definitiva para aficionados a la lucha libre</title>
+    <meta name="description" content="Tu pase de primera fila. Centraliza carteleras, sigue a tus ídolos y vive la historia de la lucha libre en un solo lugar. Gratis en Android.">
+    <meta property="og:title" content="OWG — La app definitiva para aficionados a la lucha libre">
+    <meta property="og:description" content="Tu pase de primera fila. Carteleras, estampas digitales y el archivo definitivo del roster.">
+    <meta property="og:url" content="https://owg-app.com">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="container">
-        <header class="hero">
-            <img src="Logo Cuadro.png" alt="OWG Logo">
-            <h1>Official Wrestling Group.</h1>
-        
-        </header>
 
-        <section class="flow-cta">
-            <div class="glow-border">
-                <p>PRÓXIMO EVENTO: MODO DESARROLLADOR ACTIVO</p>
-                <button onclick="alert('Funcionalidad en desarrollo')">SOLICITAR ACCESO BETA</button>
+<nav class="site-nav">
+    <div class="nav-inner">
+        <a href="#" class="nav-brand">
+            <img src="Logo Cuadro.png" alt="OWG">
+            OWG
+        </a>
+        <button class="nav-toggle" aria-label="Menú" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+        <ul class="nav-links">
+            <li><a href="#experiencia">Experiencia</a></li>
+            <li><a href="#roster">El Roster</a></li>
+            <li><a href="#promotores">Promotores</a></li>
+            <li><a href="#apoyo">Apoyo</a></li>
+            <li><a href="https://play.google.com/store/apps/details?id=com.owg.app" target="_blank" rel="noopener">Descargar</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- 1. Hero -->
+<header class="hero">
+    <div class="hero-text">
+        <div class="hero-brand reveal">
+            <img src="Logo Cuadro.png" alt="Official Wrestling Group" class="hero-logo" width="96" height="96">
+        </div>
+        <span class="hero-badge reveal reveal-delay-1">Gratis · Diseñada por fans</span>
+        <h1 class="reveal reveal-delay-2">La app definitiva para los aficionados a la lucha libre</h1>
+        <p class="subtitle reveal reveal-delay-3">
+            Tu pase de primera fila. Centraliza carteleras, sigue de cerca a tus ídolos
+            y vive la historia de la lucha libre en un solo lugar.
+        </p>
+        <div class="hero-actions reveal reveal-delay-3">
+            <a href="https://play.google.com/store/apps/details?id=com.owg.app" class="btn btn-gold" target="_blank" rel="noopener">
+                Empieza tu colección
+            </a>
+            <a href="https://instagram.com/owg.app" class="btn btn-ghost" target="_blank" rel="noopener">
+                @owg.app
+            </a>
+        </div>
+    </div>
+
+    <!--
+      HERO — Dos capturas (solo pantalla, sin marco del teléfono)
+      1. assets/hero-cartelera.png  → pestaña Cartelera
+      2. assets/hero-evento.png     → detalle de un evento abierto
+      Ideal: 1170×2532 px cada una (o @2x 2340×5064). WebP también sirve.
+    -->
+    <div class="hero-visual reveal reveal-delay-2">
+        <div class="hero-phones">
+            <figure class="hero-phone hero-phone--back">
+                <div class="hero-phone__glow"></div>
+                <div class="hero-phone__device">
+                    <div class="hero-phone__notch"></div>
+                    <div class="hero-phone__screen">
+                        <img
+                            class="hero-phone__img"
+                            src="assets/hero-cartelera.png"
+                            alt="Cartelera de eventos en OWG"
+                            width="1170"
+                            height="2532"
+                            decoding="async"
+                            fetchpriority="high"
+                        >
+                    </div>
+                </div>
+                <figcaption class="hero-phone__caption">Cartelera</figcaption>
+            </figure>
+
+            <figure class="hero-phone hero-phone--front">
+                <div class="hero-phone__glow hero-phone__glow--gold"></div>
+                <div class="hero-phone__device">
+                    <div class="hero-phone__notch"></div>
+                    <div class="hero-phone__screen">
+                        <img
+                            class="hero-phone__img"
+                            src="assets/hero-evento.png"
+                            alt="Detalle de evento con combates en OWG"
+                            width="1170"
+                            height="2532"
+                            decoding="async"
+                        >
+                    </div>
+                </div>
+                <figcaption class="hero-phone__caption">Detalle del evento</figcaption>
+            </figure>
+        </div>
+    </div>
+</header>
+
+<!-- 2. La experiencia OWG -->
+<section class="section" id="experiencia">
+    <div class="section-header reveal">
+        <p class="section-label">Tu vitrina personal</p>
+        <h2 class="section-title">La experiencia OWG</h2>
+        <p class="section-desc">Todo lo que vives en la lucha, guardado en tu casillero digital.</p>
+    </div>
+
+    <div class="glass-grid">
+        <article class="glass-card reveal reveal-delay-1">
+            <div class="icon">📅</div>
+            <h3>Cartelera personalizada</h3>
+            <p>Olvida el desorden. Sigue a tus empresas y luchadores preferidos; nosotros filtramos el ruido para que solo veas lo que te apasiona.</p>
+        </article>
+        <article class="glass-card reveal reveal-delay-2">
+            <div class="icon">🎫</div>
+            <h3>Tu vitrina de leyendas</h3>
+            <p>Cada función que vives se convierte en una estampa digital coleccionable. Documenta tu recorrido como aficionado en tu propio casillero digital.</p>
+        </article>
+        <article class="glass-card reveal reveal-delay-3">
+            <div class="icon">★</div>
+            <h3>Conexión total</h3>
+            <p>No vuelvas a perderte una lucha. Recibe alertas en tiempo real de tus estrellas favoritas antes de que pisen el ring.</p>
+        </article>
+    </div>
+
+    <!--
+      EXPERIENCIA — Foto emocional / casillero
+      Archivo: assets/experiencia-casillero.webp
+      Ideal: foto de función (lona, público, luchador) O screenshot del Mi Casillero con estampas
+      Medidas: 1400 × 780 px (16:9) — composición horizontal cinematográfica
+      Estilo: alto contraste, tonos cálidos en ring; o UI oscura con acentos dorados #FFD700
+    -->
+    <figure class="media-slot media-slot--wide reveal is-empty" id="slot-experiencia">
+        <div class="media-slot__ambient media-slot__ambient--gold"></div>
+        <div class="media-slot__frame">
+            <span class="media-slot__corner media-slot__corner--tl"></span>
+            <span class="media-slot__corner media-slot__corner--tr"></span>
+            <span class="media-slot__corner media-slot__corner--bl"></span>
+            <span class="media-slot__corner media-slot__corner--br"></span>
+            <div class="media-slot__inner">
+                <img
+                    src="assets/experiencia-casillero.webp"
+                    alt="Aficionado en función de lucha o vitrina de estampas OWG"
+                    width="1400" height="780"
+                    onload="this.closest('.media-slot').classList.remove('is-empty')"
+                    onerror="this.closest('.media-slot').classList.add('is-empty')"
+                >
+                <div class="media-slot__placeholder" aria-hidden="true">
+                    <span class="media-slot__icon">🎫</span>
+                    <span class="media-slot__title">Foto de función o casillero</span>
+                    <span class="media-slot__file">assets/experiencia-casillero.webp</span>
+                </div>
+                <div class="media-slot__vignette"></div>
+                <div class="media-slot__label">Tu vitrina personal</div>
             </div>
-        </section>
-        
-        <footer class="footer-links">
-            <a href="privacidad.html">Aviso Legal y Privacidad</a>
-            <a href="terminos.html">Términos y Condiciones</a>
-        </footer>
-    </main>
+        </div>
+        <figcaption class="media-slot__guide">
+            <strong>Qué buscar:</strong> foto real de lona/función con energía de público, o captura del casillero con estampas de boleto.
+            <span class="media-slot__specs">1400×780 px · 16:9 · borde oscuro, sin texto superpuesto en la imagen</span>
+        </figcaption>
+    </figure>
+</section>
+
+<!-- 3. El Motor del Roster -->
+<section class="section" id="roster">
+    <div class="roster-section">
+        <div class="roster-content">
+            <p class="section-label reveal">Sin esfuerzo</p>
+            <h2 class="section-title reveal reveal-delay-1">Construye el archivo definitivo</h2>
+            <p class="section-desc reveal reveal-delay-2">
+                OWG es un ecosistema vivo. A través de nuestro modelo de procesamiento inteligente,
+                cada dato, resultado y cartelera que compartes se integra al instante, creando
+                la base de datos más precisa del mundo de la lucha.
+            </p>
+            <blockquote class="roster-copy reveal reveal-delay-3">
+                Tu pasión alimenta el roster. Cada aporte ayuda a otros fans a encontrar la información que buscan.
+            </blockquote>
+        </div>
+
+        <div class="roster-visual reveal reveal-delay-2">
+            <div class="data-flow" aria-hidden="true">
+                <svg viewBox="0 0 340 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Usuario aporta -->
+                    <rect x="20" y="20" width="100" height="60" rx="10" fill="rgba(229,9,20,0.2)" stroke="#E50914" stroke-width="1.5"/>
+                    <text x="70" y="48" text-anchor="middle" fill="#fff" font-family="Bebas Neue" font-size="13">Aportar al</text>
+                    <text x="70" y="64" text-anchor="middle" fill="#FFD700" font-family="Bebas Neue" font-size="13">Roster</text>
+
+                    <!-- Partículas cayendo -->
+                    <circle class="flow-particle" cx="120" cy="50" r="5" fill="#FFD700"/>
+                    <circle class="flow-particle" cx="135" cy="50" r="4" fill="#E50914"/>
+                    <circle class="flow-particle" cx="150" cy="50" r="5" fill="#FFD700"/>
+
+                    <!-- Flecha / flujo -->
+                    <path d="M70 90 L70 130" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4"/>
+                    <rect x="30" y="140" width="80" height="40" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)"/>
+                    <text x="70" y="165" text-anchor="middle" fill="#A8A8B2" font-family="Inter" font-size="9">Sistema organiza</text>
+
+                    <path d="M70 190 L170 230" stroke="#E50914" stroke-width="2" opacity="0.5"/>
+                    <path d="M250 190 L170 230" stroke="#E50914" stroke-width="2" opacity="0.5"/>
+
+                    <!-- Base de datos global -->
+                    <g class="db-pulse">
+                        <ellipse cx="170" cy="250" rx="90" ry="22" fill="rgba(255,215,0,0.08)" stroke="#FFD700" stroke-width="1.5"/>
+                        <ellipse cx="170" cy="242" rx="90" ry="22" fill="rgba(255,215,0,0.04)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+                        <text x="170" y="248" text-anchor="middle" fill="#FFD700" font-family="Bebas Neue" font-size="14">Archivo global</text>
+                    </g>
+
+                    <!-- Otro aporte -->
+                    <rect x="220" y="20" width="100" height="60" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                    <text x="270" y="48" text-anchor="middle" fill="#fff" font-family="Bebas Neue" font-size="13">Actualizar el</text>
+                    <text x="270" y="64" text-anchor="middle" fill="#A8A8B2" font-family="Bebas Neue" font-size="13">archivo</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Para Promotores -->
+<section class="section" id="promotores">
+    <div class="promo-section">
+        <!--
+          PROMOTORES — Transformación cartelera → poster
+          Opción A (recomendada): assets/promo-transform.mp4 — video loop 3–5 s, sin audio
+          Opción B: dos imágenes en assets/promo-cartelera.webp + assets/promo-poster.webp
+          Medidas video: 1280×720 px · Medidas imágenes: 600×800 px cada una (3:4 poster)
+          Estilo: cartelera impresa real → poster digital con borde dorado y tipografía Bebas Neue
+        -->
+        <div class="promo-visual reveal">
+            <figure class="media-slot media-slot--vertical is-empty" id="slot-promo-video">
+                <div class="media-slot__ambient"></div>
+                <div class="media-slot__frame">
+                    <span class="media-slot__corner media-slot__corner--tl"></span>
+                    <span class="media-slot__corner media-slot__corner--tr"></span>
+                    <span class="media-slot__corner media-slot__corner--bl"></span>
+                    <span class="media-slot__corner media-slot__corner--br"></span>
+                    <div class="media-slot__inner">
+                        <video
+                            id="promo-video"
+                            src="assets/promo-transform.MP4"
+                            autoplay loop muted playsinline
+                            data-playback-rate="1.75"
+                            onloadeddata="this.closest('.media-slot').classList.remove('is-empty'); this.playbackRate = parseFloat(this.dataset.playbackRate) || 1.75;"
+                            onerror="this.closest('.media-slot').classList.add('is-empty')"
+                        ></video>
+                        <div class="media-slot__placeholder" aria-hidden="true">
+                            <span class="media-slot__icon">🎬</span>
+                            <span class="media-slot__title">Video cartelera → poster</span>
+                            <span class="media-slot__file">assets/promo-transform.mp4</span>
+                        </div>
+                        <div class="media-slot__vignette"></div>
+                        <div class="media-slot__label">Lanzamiento oficial</div>
+                    </div>
+                </div>
+                <figcaption class="media-slot__guide">
+                    <strong>Qué buscar:</strong> loop corto vertical de cartelera física convirtiéndose en poster digital OWG.
+                    <span class="media-slot__specs">1080×1920 px · MP4 vertical · 3–5 s loop · sin audio</span>
+                </figcaption>
+            </figure>
+
+            <div class="promo-duo">
+                <figure class="media-slot media-slot--vertical is-empty" id="slot-promo-before">
+                    <div class="media-slot__frame media-slot__frame--compact">
+                        <div class="media-slot__inner">
+                            <img
+                                src="assets/promo-cartelera.webp"
+                                alt="Cartelera impresa de función"
+                                width="600" height="800"
+                                onload="this.closest('.media-slot').classList.remove('is-empty')"
+                                onerror="this.closest('.media-slot').classList.add('is-empty')"
+                            >
+                            <div class="media-slot__placeholder media-slot__placeholder--sm" aria-hidden="true">
+                                <span class="media-slot__file">promo-cartelera.webp</span>
+                            </div>
+                        </div>
+                    </div>
+                    <figcaption class="media-slot__guide media-slot__guide--sm">Cartelera original · 600×800</figcaption>
+                </figure>
+
+                <div class="promo-duo__arrow" aria-hidden="true">→</div>
+
+                <figure class="media-slot media-slot--vertical is-empty" id="slot-promo-after">
+                    <div class="media-slot__frame media-slot__frame--compact media-slot__frame--gold">
+                        <div class="media-slot__inner">
+                            <img
+                                src="assets/promo-poster.webp"
+                                alt="Poster digital generado en OWG"
+                                width="600" height="800"
+                                onload="this.closest('.media-slot').classList.remove('is-empty')"
+                                onerror="this.closest('.media-slot').classList.add('is-empty')"
+                            >
+                            <div class="media-slot__placeholder media-slot__placeholder--sm" aria-hidden="true">
+                                <span class="media-slot__file">promo-poster.webp</span>
+                            </div>
+                        </div>
+                    </div>
+                    <figcaption class="media-slot__guide media-slot__guide--sm">Poster digital · 600×800</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <div class="promo-content">
+            <p class="section-label reveal">Lanzamiento oficial</p>
+            <h2 class="section-title reveal reveal-delay-1">Dale un escenario profesional a tu promoción</h2>
+            <p class="section-desc reveal reveal-delay-2">
+                Gestionar tus carteleras nunca fue tan sencillo. Publica tus eventos en segundos
+                y genera posters digitales de alto impacto listos para tus redes sociales.
+                El sistema organiza cada detalle con precisión — tú te enfocas en el show.
+            </p>
+            <div class="promo-features reveal reveal-delay-3">
+                <span class="promo-tag">Publicar en segundos</span>
+                <span class="promo-tag">Posters para redes</span>
+                <span class="promo-tag">Panel de funciones</span>
+                <span class="promo-tag">Logros por desbloquear</span>
+            </div>
+            <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;" class="reveal reveal-delay-3">
+                ¿Tienes una promoción? Escríbenos a
+                <a href="mailto:contacto@owg-app.com">contacto@owg-app.com</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- 5. Apoyo Comunitario -->
+<section class="support-section" id="apoyo">
+    <p class="section-label reveal">El cierre</p>
+    <h2 class="section-title reveal reveal-delay-1">¿Quieres que OWG crezca más rápido?</h2>
+    <p class="support-slogan reveal reveal-delay-2">Cómprame una máscara</p>
+    <p class="support-copy reveal reveal-delay-2">
+        OWG es gratuito, diseñado por fans para fans. Tu apoyo nos permite mantener los servidores activos,
+        mejorar nuestra tecnología y seguir sumando funciones sin comprometer la gratuidad de la app.
+    </p>
+
+    <div class="support-tiers reveal reveal-delay-3">
+        <div class="tier-pill">
+            <div class="name">Aspirante</div>
+            <div class="price">$49 MXN</div>
+        </div>
+        <div class="tier-pill featured">
+            <div class="name">Luchador</div>
+            <div class="price">$99 MXN</div>
+        </div>
+        <div class="tier-pill">
+            <div class="name">Leyenda</div>
+            <div class="price">$199 MXN</div>
+        </div>
+    </div>
+
+    <a href="https://play.google.com/store/apps/details?id=com.owg.app" class="btn btn-gold reveal reveal-delay-3" target="_blank" rel="noopener">
+        Apoya desde la app
+    </a>
+    <p class="support-legal reveal" style="margin-top: 1.25rem;">
+        Pago único · No desbloquea premium · Gracias por creer en el proyecto
+    </p>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <a href="#" class="nav-brand">
+                <img src="Logo Cuadro.png" alt="OWG">
+                Official Wrestling Group
+            </a>
+            <p>Plataforma independiente de información y comunidad. Sin afiliación oficial con empresas promotoras.</p>
+        </div>
+        <div class="footer-links">
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacidad.html">Privacidad</a></li>
+                    <li><a href="terminos.html">Términos</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contacto</h4>
+                <ul>
+                    <li><a href="mailto:contacto@owg-app.com">contacto@owg-app.com</a></li>
+                    <li><a href="https://instagram.com/owg.app" target="_blank" rel="noopener">@owg.app</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">© 2026 Official Wrestling Group · owg-app.com</div>
+</footer>
+
+<script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    reveals.forEach(el => observer.observe(el));
+
+    const promoVideo = document.getElementById('promo-video');
+    if (promoVideo) {
+        const rate = parseFloat(promoVideo.dataset.playbackRate) || 1.75;
+        const setRate = () => { promoVideo.playbackRate = rate; };
+        promoVideo.addEventListener('loadedmetadata', setRate);
+        setRate();
+    }
+</script>
+
 </body>
 </html>
