@@ -3,7 +3,7 @@
 :root {
     --bg: #0F0F12;
     --red: #E50914;
-    --gold: #FFD700;
+    --gold: #b8a53a;
     --text: #FFFFFF;
     --text-muted: #A8A8B2;
     --glass: rgba(255, 255, 255, 0.04);
@@ -164,9 +164,32 @@ a { color: var(--gold); }
     box-shadow: 0 8px 28px rgba(229, 9, 20, 0.45);
 }
 
+.btn-gold--cutout {
+    isolation: isolate;
+}
+
 .btn-gold:hover {
     box-shadow: 0 12px 36px rgba(229, 9, 20, 0.6);
     filter: brightness(1.05);
+}
+
+.btn-gold--cutout:hover {
+    background: linear-gradient(135deg, #f0d000, #ffe44d);
+    box-shadow: 0 12px 36px rgba(229, 9, 20, 0.6);
+    filter: none;
+}
+
+.btn-icon {
+    flex-shrink: 0;
+    display: block;
+}
+
+.btn-icon--play {
+    mix-blend-mode: destination-out;
+}
+
+.btn-icon--play path {
+    fill: #000;
 }
 
 .btn-ghost {
@@ -343,13 +366,14 @@ a { color: var(--gold); }
 .hero-phone__device {
     position: relative;
     z-index: 1;
-    background: linear-gradient(155deg, #32323a 0%, #141418 55%, #0a0a0c 100%);
-    border-radius: 34px;
-    padding: 11px;
+    background: linear-gradient(155deg, #2a2a30 0%, #121214 55%, #0a0a0c 100%);
+    border-radius: 25px;
+    padding: 4px;
+    overflow: hidden;
     box-shadow:
         0 28px 56px rgba(0, 0, 0, 0.55),
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        0 0 0 0.5px rgba(255, 255, 255, 0.15),
+        inset 0 0.5px 0 rgba(255, 255, 255, 0.1);
 }
 
 .hero-phone--front .hero-phone__device {
@@ -362,19 +386,20 @@ a { color: var(--gold); }
 
 .hero-phone__notch {
     position: absolute;
-    top: 20px;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 72px;
-    height: 22px;
+    width: 56px;
+    height: 14px;
     background: #0a0a0c;
-    border-radius: 12px;
+    border-radius: 8px;
     z-index: 3;
 }
 
 .hero-phone__screen {
     position: relative;
-    border-radius: 26px;
+    margin: -2px;
+    border-radius: 22px;
     overflow: hidden;
     background: #0F0F12;
     line-height: 0;
@@ -385,8 +410,10 @@ a { color: var(--gold); }
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center top;
+    transform: scale(1);
+    transform-origin: center top;
 }
 
 .hero-phone__placeholder {

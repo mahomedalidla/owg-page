@@ -9,6 +9,9 @@
     <meta property="og:description" content="Tu pase de primera fila. Carteleras, estampas digitales y el archivo definitivo del roster.">
     <meta property="og:url" content="https://owg-app.com">
     <meta property="og:type" content="website">
+    <link rel="icon" href="Logo Cuadro.png" type="image/png" sizes="any">
+    <link rel="apple-touch-icon" href="Logo Cuadro.png">
+    <meta name="theme-color" content="#0F0F12">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -43,7 +46,13 @@
             y vive la historia de la lucha libre en un solo lugar.
         </p>
         <div class="hero-actions reveal reveal-delay-3">
-            <a href="https://play.google.com/store/apps/details?id=com.owg.app" class="btn btn-gold" target="_blank" rel="noopener">
+            <a href="https://play.google.com/store/apps/details?id=com.owg.app" class="btn btn-gold btn-gold--cutout" target="_blank" rel="noopener">
+                <svg class="btn-icon btn-icon--play" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                    <path d="M3 20.5V3.5C3 2.91 3.34 2.39 3.84 2.15L13.69 12 3.84 21.85C3.34 21.61 3 21.09 3 20.5Z"/>
+                    <path d="M16.81 15.12 6.05 21.34l8.49-8.49 2.27 2.27Z"/>
+                    <path d="M20.16 10.81c.34.27.59.69.59 1.19s-.25.92-.59 1.19l-2.29 1.32-2.5-2.5 2.5-2.5 2.29 1.32Z"/>
+                    <path d="M6.05 2.66 16.81 8.88l-2.27 2.27L6.05 2.66Z"/>
+                </svg>
                 Empieza tu colección
             </a>
             <a href="https://instagram.com/owg.app" class="btn btn-ghost" target="_blank" rel="noopener">
@@ -52,12 +61,7 @@
         </div>
     </div>
 
-    <!--
-      HERO — Dos capturas (solo pantalla, sin marco del teléfono)
-      1. assets/hero-cartelera.png  → pestaña Cartelera
-      2. assets/hero-evento.png     → detalle de un evento abierto
-      Ideal: 1170×2532 px cada una (o @2x 2340×5064). WebP también sirve.
-    -->
+    
     <div class="hero-visual reveal reveal-delay-2">
         <div class="hero-phones">
             <figure class="hero-phone hero-phone--back">
@@ -126,13 +130,7 @@
         </article>
     </div>
 
-    <!--
-      EXPERIENCIA — Foto emocional / casillero
-      Archivo: assets/experiencia-casillero.webp
-      Ideal: foto de función (lona, público, luchador) O screenshot del Mi Casillero con estampas
-      Medidas: 1400 × 780 px (16:9) — composición horizontal cinematográfica
-      Estilo: alto contraste, tonos cálidos en ring; o UI oscura con acentos dorados #FFD700
-    -->
+  
     <figure class="media-slot media-slot--wide reveal is-empty" id="slot-experiencia">
         <div class="media-slot__ambient media-slot__ambient--gold"></div>
         <div class="media-slot__frame">
@@ -157,10 +155,7 @@
                 <div class="media-slot__label">Tu vitrina personal</div>
             </div>
         </div>
-        <figcaption class="media-slot__guide">
-            <strong>Qué buscar:</strong> foto real de lona/función con energía de público, o captura del casillero con estampas de boleto.
-            <span class="media-slot__specs">1400×780 px · 16:9 · borde oscuro, sin texto superpuesto en la imagen</span>
-        </figcaption>
+        
     </figure>
 </section>
 
@@ -283,13 +278,7 @@
 <!-- 4. Para Promotores -->
 <section class="section" id="promotores">
     <div class="promo-section">
-        <!--
-          PROMOTORES — Transformación cartelera → poster
-          Opción A (recomendada): assets/promo-transform.mp4 — video loop 3–5 s, sin audio
-          Opción B: dos imágenes en assets/promo-cartelera.webp + assets/promo-poster.webp
-          Medidas video: 1280×720 px · Medidas imágenes: 600×800 px cada una (3:4 poster)
-          Estilo: cartelera impresa real → poster digital con borde dorado y tipografía Bebas Neue
-        -->
+        
         <div class="promo-visual reveal">
             <figure class="media-slot media-slot--vertical is-empty" id="slot-promo-video">
                 <div class="media-slot__ambient"></div>
@@ -307,19 +296,12 @@
                             onloadeddata="this.closest('.media-slot').classList.remove('is-empty'); this.playbackRate = parseFloat(this.dataset.playbackRate) || 1.75;"
                             onerror="this.closest('.media-slot').classList.add('is-empty')"
                         ></video>
-                        <div class="media-slot__placeholder" aria-hidden="true">
-                            <span class="media-slot__icon">🎬</span>
-                            <span class="media-slot__title">Video cartelera → poster</span>
-                            <span class="media-slot__file">assets/promo-transform.mp4</span>
-                        </div>
+                        
                         <div class="media-slot__vignette"></div>
                         <div class="media-slot__label">Lanzamiento oficial</div>
                     </div>
                 </div>
-                <figcaption class="media-slot__guide">
-                    <strong>Qué buscar:</strong> loop corto vertical de cartelera física convirtiéndose en poster digital OWG.
-                    <span class="media-slot__specs">1080×1920 px · MP4 vertical · 3–5 s loop · sin audio</span>
-                </figcaption>
+               
             </figure>
 
             <div class="promo-duo">
@@ -365,7 +347,7 @@
 
         <div class="promo-content">
             <p class="section-label reveal">Lanzamiento oficial</p>
-            <h2 class="section-title reveal reveal-delay-1">Dale un escenario profesional a tu promoción</h2>
+            <h2 class="section-title reveal reveal-delay-1">Dale un escenario profesional a tu empresa</h2>
             <p class="section-desc reveal reveal-delay-2">
                 Gestionar tus carteleras nunca fue tan sencillo. Publica tus eventos en segundos
                 y genera posters digitales de alto impacto listos para tus redes sociales.
@@ -378,7 +360,7 @@
                 <span class="promo-tag">Logros por desbloquear</span>
             </div>
             <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;" class="reveal reveal-delay-3">
-                ¿Tienes una promoción? Escríbenos a
+                ¿Tienes una empresa? Escríbenos a
                 <a href="mailto:contacto@owg-app.com">contacto@owg-app.com</a>
             </p>
         </div>
