@@ -29,23 +29,9 @@
       padding: 28px 24px;
       text-align: center;
     }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
-      letter-spacing: 2px;
-      font-weight: 700;
-    }
-    .sub {
-      margin: 0 0 12px;
-      color: #ffffff66;
-      font-size: 13px;
-    }
-    #status {
-      margin: 0;
-      color: #ffffffb3;
-      line-height: 1.5;
-      font-size: 15px;
-    }
+    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 2px; font-weight: 700; }
+    .sub { margin: 0 0 12px; color: #ffffff66; font-size: 13px; }
+    #status { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 15px; }
     .btn {
       display: inline-block;
       margin-top: 16px;
@@ -61,7 +47,6 @@
     .btn-secondary {
       background: transparent;
       border: 1px solid #ffffff33;
-      margin-left: 8px;
     }
     .actions {
       margin-top: 20px;
@@ -93,13 +78,13 @@
   </div>
   <script>
     (function () {
-      var match = window.location.pathname.match(/\/evento\/(\d+)/);
-      var eventId = match ? match[1] : null;
+      var params = new URLSearchParams(window.location.search);
+      var fromQuery = params.get('id');
+      var fromPath = window.location.pathname.match(/\/evento\/(\d+)/);
+      var eventId = fromQuery || (fromPath ? fromPath[1] : null);
 
-      var playStore =
-        'https://play.google.com/store/apps/details?id=com.owg.app';
-      var appStore =
-        'https://apps.apple.com/search?term=OWG+wrestling+lucha+libre';
+      var playStore = 'https://play.google.com/store/apps/details?id=com.owg.app';
+      var appStore = 'https://apps.apple.com/search?term=OWG+wrestling+lucha+libre';
       var isAndroid = /Android/i.test(navigator.userAgent);
       var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       var storeUrl = isIOS ? appStore : playStore;
@@ -111,9 +96,9 @@
 
       getBtn.href = storeUrl;
 
-      if (!eventId) {
+      if (!eventId || !/^\d+$/.test(String(eventId))) {
         statusEl.textContent =
-          'Enlace de evento no válido. Pide otro enlace desde la cartelera OWG.';
+          'Enlace de evento no válido. Comparte de nuevo desde la cartelera OWG.';
         getBtn.textContent = 'Descargar OWG';
         actionsEl.style.display = 'flex';
         openBtn.style.display = 'none';
@@ -140,21 +125,22 @@
         actionsEl.style.display = 'flex';
       }
 
-      // Intento automático al cargar
       if (isAndroid) {
         window.location.href = intentLink;
+        setTimeout(mostrarOpciones, 2200);
       } else if (isIOS) {
         window.location.href = deepLink;
+        setTimeout(function () {
+          window.location.href = storeUrl;
+        }, 1600);
+        setTimeout(mostrarOpciones, 2400);
       } else {
         statusEl.textContent =
-          'Comparte este enlace en tu celular para abrir el evento en OWG.';
+          'Abre este enlace en tu celular para ver la cartelera en OWG.';
         actionsEl.style.display = 'flex';
-        openBtn.textContent = 'Ver en owg-app.com';
+        openBtn.textContent = 'Ir a owg-app.com';
         openBtn.href = 'https://owg-app.com';
-        return;
       }
-
-      setTimeout(mostrarOpciones, 2200);
     })();
   </script>
 </body>
