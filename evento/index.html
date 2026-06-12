@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Abrir evento en OWG…</title>
+  <meta name="robots" content="noindex">
+  <meta property="og:title" content="Evento en OWG">
+  <meta property="og:description" content="Carteleras y lucha libre — Official Wrestling Group">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 420px;
+      width: 100%;
+      background: #131316;
+      border: 1px solid #2a2a30;
+      border-radius: 12px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+    .sub {
+      margin: 0 0 12px;
+      color: #ffffff66;
+      font-size: 13px;
+    }
+    #status {
+      margin: 0;
+      color: #ffffffb3;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 14px 24px;
+      background: #e50914;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-size: 15px;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid #ffffff33;
+      margin-left: 8px;
+    }
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .hint {
+      margin: 16px 0 0;
+      color: #ffffff55;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>OWG</h1>
+    <p class="sub">Official Wrestling Group</p>
+    <p id="status">Abriendo cartelera del evento…</p>
+    <div class="actions" id="actions" style="display:none">
+      <a id="open-app" class="btn" href="#">Abrir en OWG</a>
+      <a id="get-app" class="btn btn-secondary" href="#">Descargar la app</a>
+    </div>
+    <p class="hint" id="hint">
+      Si ya tienes OWG, el evento se abrirá en la app. Si no, te llevamos a la tienda.
+    </p>
+  </div>
+  <script>
+    (function () {
+      var match = window.location.pathname.match(/\/evento\/(\d+)/);
+      var eventId = match ? match[1] : null;
+
+      var playStore =
+        'https://play.google.com/store/apps/details?id=com.owg.app';
+      var appStore =
+        'https://apps.apple.com/search?term=OWG+wrestling+lucha+libre';
+      var isAndroid = /Android/i.test(navigator.userAgent);
+      var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      var storeUrl = isIOS ? appStore : playStore;
+
+      var statusEl = document.getElementById('status');
+      var actionsEl = document.getElementById('actions');
+      var openBtn = document.getElementById('open-app');
+      var getBtn = document.getElementById('get-app');
+
+      getBtn.href = storeUrl;
+
+      if (!eventId) {
+        statusEl.textContent =
+          'Enlace de evento no válido. Pide otro enlace desde la cartelera OWG.';
+        getBtn.textContent = 'Descargar OWG';
+        actionsEl.style.display = 'flex';
+        openBtn.style.display = 'none';
+        return;
+      }
+
+      var deepLink = 'owg://evento/' + eventId;
+      var intentLink =
+        'intent://evento/' + eventId +
+        '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
+        encodeURIComponent(storeUrl) + ';end';
+
+      openBtn.href = isAndroid ? intentLink : deepLink;
+
+      openBtn.addEventListener('click', function (e) {
+        if (!isAndroid) return;
+        e.preventDefault();
+        window.location.href = intentLink;
+      });
+
+      function mostrarOpciones() {
+        statusEl.textContent =
+          '¿Tienes OWG? Abre el evento. Si no, descarga la app gratis.';
+        actionsEl.style.display = 'flex';
+      }
+
+      // Intento automático al cargar
+      if (isAndroid) {
+        window.location.href = intentLink;
+      } else if (isIOS) {
+        window.location.href = deepLink;
+      } else {
+        statusEl.textContent =
+          'Comparte este enlace en tu celular para abrir el evento en OWG.';
+        actionsEl.style.display = 'flex';
+        openBtn.textContent = 'Ver en owg-app.com';
+        openBtn.href = 'https://owg-app.com';
+        return;
+      }
+
+      setTimeout(mostrarOpciones, 2200);
+    })();
+  </script>
+</body>
+</html>

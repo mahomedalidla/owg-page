@@ -1,0 +1,4 @@
+RewriteEngine On
+
+# /evento/123 → página puente (Apache; ajusta en tu hosting si usas otra regla)
+RewriteRule ^evento/([0-9]+)/?$ evento/index.html [L,QSA]
