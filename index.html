@@ -165,54 +165,116 @@
 </section>
 
 <!-- 3. El Motor del Roster -->
-<section class="section" id="roster">
+<section class="section section--roster" id="roster">
     <div class="roster-section">
         <div class="roster-content">
             <p class="section-label reveal">Sin esfuerzo</p>
             <h2 class="section-title reveal reveal-delay-1">Construye el archivo definitivo</h2>
             <p class="section-desc reveal reveal-delay-2">
-                OWG es un ecosistema vivo. A través de nuestro modelo de procesamiento inteligente,
-                cada dato, resultado y cartelera que compartes se integra al instante, creando
-                la base de datos más precisa del mundo de la lucha.
+                OWG es un ecosistema vivo. Cada cartelera, resultado o foto que compartes
+                pasa por el roster y alimenta la base de datos más precisa del mundo de la lucha.
             </p>
+
+            <ol class="roster-steps-list reveal reveal-delay-2">
+                <li class="roster-steps-list__item is-active" data-roster-step="0">
+                    <span class="roster-steps-list__num">01</span>
+                    <span><strong>Aportas al roster</strong> — evento, combate, resultado o foto</span>
+                </li>
+                <li class="roster-steps-list__item" data-roster-step="1">
+                    <span class="roster-steps-list__num">02</span>
+                    <span><strong>El sistema organiza</strong> — precisión y orden al instante</span>
+                </li>
+                <li class="roster-steps-list__item" data-roster-step="2">
+                    <span class="roster-steps-list__num">03</span>
+                    <span><strong>Entra al archivo</strong> — verificado y disponible para todos</span>
+                </li>
+                <li class="roster-steps-list__item" data-roster-step="3">
+                    <span class="roster-steps-list__num">04</span>
+                    <span><strong>La comunidad lo usa</strong> — fans y promotores encuentran la info</span>
+                </li>
+            </ol>
+
             <blockquote class="roster-copy reveal reveal-delay-3">
                 Tu pasión alimenta el roster. Cada aporte ayuda a otros fans a encontrar la información que buscan.
             </blockquote>
         </div>
 
         <div class="roster-visual reveal reveal-delay-2">
-            <div class="data-flow" aria-hidden="true">
-                <svg viewBox="0 0 340 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Usuario aporta -->
-                    <rect x="20" y="20" width="100" height="60" rx="10" fill="rgba(229,9,20,0.2)" stroke="#E50914" stroke-width="1.5"/>
-                    <text x="70" y="48" text-anchor="middle" fill="#fff" font-family="Bebas Neue" font-size="13">Aportar al</text>
-                    <text x="70" y="64" text-anchor="middle" fill="#FFD700" font-family="Bebas Neue" font-size="13">Roster</text>
+            <div class="roster-engine" id="roster-engine" aria-hidden="true">
+                <!-- Capa 1: Fans aportan -->
+                <div class="roster-engine__layer roster-engine__layer--contrib" data-roster-layer="0">
+                    <p class="roster-engine__layer-label">Fans aportan</p>
+                    <div class="roster-contribs">
+                        <div class="roster-contrib">
+                            <span class="roster-contrib__icon">📋</span>
+                            <span class="roster-contrib__name">Cartelera</span>
+                            <span class="roster-contrib__dot"></span>
+                        </div>
+                        <div class="roster-contrib">
+                            <span class="roster-contrib__icon">🏆</span>
+                            <span class="roster-contrib__name">Resultado</span>
+                            <span class="roster-contrib__dot"></span>
+                        </div>
+                        <div class="roster-contrib">
+                            <span class="roster-contrib__icon">📸</span>
+                            <span class="roster-contrib__name">Foto</span>
+                            <span class="roster-contrib__dot"></span>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Partículas cayendo -->
-                    <circle class="flow-particle" cx="120" cy="50" r="5" fill="#FFD700"/>
-                    <circle class="flow-particle" cx="135" cy="50" r="4" fill="#E50914"/>
-                    <circle class="flow-particle" cx="150" cy="50" r="5" fill="#FFD700"/>
+                <!-- Flujo descendente -->
+                <div class="roster-streams">
+                    <div class="roster-stream roster-stream--1"><span class="roster-stream__packet"></span></div>
+                    <div class="roster-stream roster-stream--2"><span class="roster-stream__packet"></span></div>
+                    <div class="roster-stream roster-stream--3"><span class="roster-stream__packet"></span></div>
+                </div>
 
-                    <!-- Flecha / flujo -->
-                    <path d="M70 90 L70 130" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4"/>
-                    <rect x="30" y="140" width="80" height="40" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)"/>
-                    <text x="70" y="165" text-anchor="middle" fill="#A8A8B2" font-family="Inter" font-size="9">Sistema organiza</text>
+                <!-- Capa 2: Sistema procesa -->
+                <div class="roster-engine__layer roster-engine__layer--hub" data-roster-layer="1">
+                    <div class="roster-hub">
+                        <div class="roster-hub__ring roster-hub__ring--1"></div>
+                        <div class="roster-hub__ring roster-hub__ring--2"></div>
+                        <div class="roster-hub__ring roster-hub__ring--3"></div>
+                        <div class="roster-hub__core">
+                            <span class="roster-hub__icon">⚙</span>
+                            <span class="roster-hub__title">Sistema OWG</span>
+                            <span class="roster-hub__sub">Organiza · Verifica · Integra</span>
+                        </div>
+                    </div>
+                </div>
 
-                    <path d="M70 190 L170 230" stroke="#E50914" stroke-width="2" opacity="0.5"/>
-                    <path d="M250 190 L170 230" stroke="#E50914" stroke-width="2" opacity="0.5"/>
+                <div class="roster-streams roster-streams--down">
+                    <div class="roster-stream roster-stream--center"><span class="roster-stream__packet roster-stream__packet--gold"></span></div>
+                </div>
 
-                    <!-- Base de datos global -->
-                    <g class="db-pulse">
-                        <ellipse cx="170" cy="250" rx="90" ry="22" fill="rgba(255,215,0,0.08)" stroke="#FFD700" stroke-width="1.5"/>
-                        <ellipse cx="170" cy="242" rx="90" ry="22" fill="rgba(255,215,0,0.04)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-                        <text x="170" y="248" text-anchor="middle" fill="#FFD700" font-family="Bebas Neue" font-size="14">Archivo global</text>
-                    </g>
+                <!-- Capa 3: Archivo global -->
+                <div class="roster-engine__layer roster-engine__layer--archive" data-roster-layer="2">
+                    <div class="roster-archive">
+                        <div class="roster-archive__stack">
+                            <div class="roster-archive__layer-item"></div>
+                            <div class="roster-archive__layer-item"></div>
+                            <div class="roster-archive__layer-item"></div>
+                            <div class="roster-archive__layer-item roster-archive__layer-item--top"></div>
+                        </div>
+                        <div class="roster-archive__label">
+                            <span class="roster-archive__title">Archivo global</span>
+                            <span class="roster-archive__meta">Carteleras · Luchadores · Resultados</span>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Otro aporte -->
-                    <rect x="220" y="20" width="100" height="60" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-                    <text x="270" y="48" text-anchor="middle" fill="#fff" font-family="Bebas Neue" font-size="13">Actualizar el</text>
-                    <text x="270" y="64" text-anchor="middle" fill="#A8A8B2" font-family="Bebas Neue" font-size="13">archivo</text>
-                </svg>
+                <!-- Capa 4: Comunidad -->
+                <div class="roster-engine__layer roster-engine__layer--community" data-roster-layer="3">
+                    <div class="roster-community">
+                        <div class="roster-community__nodes">
+                            <span class="roster-community__node">★</span>
+                            <span class="roster-community__node">🔍</span>
+                            <span class="roster-community__node">📅</span>
+                        </div>
+                        <p class="roster-community__text">Toda la comunidad encuentra la info</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -403,6 +465,49 @@
         const setRate = () => { promoVideo.playbackRate = rate; };
         promoVideo.addEventListener('loadedmetadata', setRate);
         setRate();
+    }
+
+    // Roster engine: ciclo de pasos sincronizado
+    const rosterEngine = document.getElementById('roster-engine');
+    const rosterStepItems = document.querySelectorAll('.roster-steps-list__item');
+    const rosterLayers = document.querySelectorAll('[data-roster-layer]');
+
+    if (rosterEngine && rosterStepItems.length) {
+        let currentStep = 0;
+        const totalSteps = rosterStepItems.length;
+
+        const setRosterStep = (step) => {
+            currentStep = step;
+            rosterStepItems.forEach((item, i) => {
+                item.classList.toggle('is-active', i === step);
+            });
+            rosterLayers.forEach((layer) => {
+                const layerStep = parseInt(layer.dataset.rosterLayer, 10);
+                layer.classList.remove('is-dim', 'is-highlight');
+                if (layerStep === step) {
+                    layer.classList.add('is-highlight');
+                } else if (layerStep !== step) {
+                    layer.classList.add('is-dim');
+                }
+            });
+        };
+
+        setRosterStep(0);
+
+        const rosterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!rosterEngine.dataset.cycling) {
+                        rosterEngine.dataset.cycling = '1';
+                        setInterval(() => {
+                            setRosterStep((currentStep + 1) % totalSteps);
+                        }, 2800);
+                    }
+                }
+            });
+        }, { threshold: 0.3 });
+
+        rosterObserver.observe(rosterEngine);
     }
 </script>
 
