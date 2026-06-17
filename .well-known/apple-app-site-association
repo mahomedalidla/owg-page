@@ -4,7 +4,12 @@
     "details": [
       {
         "appID": "TEAMID.com.owg.app",
-        "paths": ["/auth/callback", "/auth/callback/*"]
+        "paths": [
+          "/auth/callback",
+          "/auth/callback/*",
+          "/evento/*",
+          "/evento/index.html"
+        ]
       }
     ]
   }
