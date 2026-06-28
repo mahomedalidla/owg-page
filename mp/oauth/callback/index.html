@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conectando Mercado Pago…</title>
+  <meta name="robots" content="noindex">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 420px;
+      width: 100%;
+      background: #131316;
+      border: 1px solid #2a2a30;
+      border-radius: 12px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 2px; }
+    .sub { margin: 0 0 20px; color: #ffffff66; font-size: 13px; }
+    #status { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 15px; }
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 24px;
+      background: #009ee3;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .hint { margin: 16px 0 0; color: #ffffff55; font-size: 12px; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>OWG</h1>
+    <p class="sub">Mercado Pago</p>
+    <p id="status">Toca el botón para volver a la app y terminar la conexión.</p>
+    <a id="open-app" class="btn" href="#">Continuar en OWG</a>
+    <p class="hint">Debes iniciar la conexión desde Boletaje en la app OWG.</p>
+  </div>
+  <script>
+    (function () {
+      var params = window.location.search;
+      if (!params || params.indexOf('code=') === -1) {
+        document.getElementById('status').textContent =
+          'Enlace incompleto. Vuelve a la app e intenta conectar de nuevo.';
+        document.getElementById('open-app').style.display = 'none';
+        return;
+      }
+
+      var deepLink = 'owg://mp-oauth' + params;
+      var fallback = encodeURIComponent(window.location.href);
+      var isAndroid = /Android/i.test(navigator.userAgent);
+      var intentLink =
+        'intent://mp-oauth/' + params +
+        '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
+        fallback + ';end';
+
+      var openBtn = document.getElementById('open-app');
+      openBtn.href = isAndroid ? intentLink : deepLink;
+
+      openBtn.addEventListener('click', function (e) {
+        if (!isAndroid) return;
+        e.preventDefault();
+        window.location.href = intentLink;
+        setTimeout(function () { window.location.href = deepLink; }, 800);
+      });
+    })();
+  </script>
+</body>
+</html>
