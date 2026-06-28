@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pago OWG</title>
+  <meta name="robots" content="noindex">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, sans-serif;
+      background: #0f0f12;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 420px;
+      background: #131316;
+      border: 1px solid #2a2a30;
+      border-radius: 12px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 24px;
+      background: #e50914;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">OWG</h1>
+    <p id="status">Toca el botón para volver a la app.</p>
+    <a id="open-app" class="btn" href="#">Volver a OWG</a>
+  </div>
+  <script>
+    (function () {
+      var params = window.location.search;
+      var status = new URLSearchParams(params).get('status') || 'success';
+      var titles = {
+        success: 'Pago recibido',
+        failure: 'Pago no completado',
+        pending: 'Pago pendiente'
+      };
+      document.getElementById('title').textContent = titles[status] || 'OWG';
+      document.getElementById('status').textContent =
+        status === 'success'
+          ? 'Si el pago se confirmó, tu boleto aparecerá en Mis Boletos.'
+          : 'Puedes volver a la app para intentar de nuevo.';
+
+      var deepLink = 'owg://payment-result' + params;
+      var fallback = encodeURIComponent(window.location.href);
+      var isAndroid = /Android/i.test(navigator.userAgent);
+      var intentLink =
+        'intent://payment-result/' + params +
+        '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
+        fallback + ';end';
+
+      var openBtn = document.getElementById('open-app');
+      openBtn.href = isAndroid ? intentLink : deepLink;
+      openBtn.addEventListener('click', function (e) {
+        if (!isAndroid) return;
+        e.preventDefault();
+        window.location.href = intentLink;
+        setTimeout(function () { window.location.href = deepLink; }, 800);
+      });
+    })();
+  </script>
+</body>
+</html>
