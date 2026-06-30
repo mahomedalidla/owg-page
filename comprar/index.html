@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comprar boletos — OWG</title>
+  <meta name="description" content="Compra boletos para eventos de lucha libre con Mercado Pago. Sin descargar la app.">
+  <meta property="og:title" content="Boletos — OWG">
+  <meta property="og:description" content="Compra en línea y recibe tu QR por correo.">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
+      color: #fff;
+      padding: 20px 16px 40px;
+    }
+    .wrap { max-width: 480px; margin: 0 auto; }
+    .brand {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 3px;
+      font-weight: 800;
+    }
+    .brand p {
+      margin: 4px 0 0;
+      color: #ffffff55;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+    .card {
+      background: #131316;
+      border: 1px solid #2a2a30;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    #status {
+      text-align: center;
+      color: #ffffffb3;
+      line-height: 1.5;
+      padding: 32px 8px;
+    }
+    #event-title {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      line-height: 1.25;
+    }
+    #event-meta, #event-promo {
+      margin: 0;
+      color: #ffffff80;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    #event-promo {
+      margin-top: 6px;
+      color: #e50914;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.8px;
+    }
+    .section-label {
+      margin: 0 0 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: #ffffff55;
+      text-transform: uppercase;
+    }
+    .tiers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tier {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      gap: 2px 12px;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #2a2a30;
+      background: #1a1a20;
+      color: #fff;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .tier:hover:not(:disabled) {
+      border-color: #e5091466;
+    }
+    .tier--active {
+      border-color: #e50914;
+      background: linear-gradient(135deg, #231229 0%, #131316 100%);
+    }
+    .tier--sold {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .tier__name {
+      font-weight: 700;
+      font-size: 15px;
+      grid-column: 1;
+    }
+    .tier__price {
+      font-weight: 800;
+      font-size: 16px;
+      color: #e50914;
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .tier__stock {
+      grid-column: 1 / -1;
+      font-size: 11px;
+      color: #ffffff55;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #ffffff55;
+      text-transform: uppercase;
+    }
+    input[type="email"],
+    input[type="number"] {
+      width: 100%;
+      padding: 14px 12px;
+      border-radius: 10px;
+      border: 1px solid #2a2a30;
+      background: #1a1a20;
+      color: #fff;
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #e50914;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    .row .field { flex: 1; }
+    .total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 16px;
+      padding-top: 12px;
+      border-top: 1px solid #2a2a30;
+    }
+    .total span:first-child {
+      font-size: 12px;
+      color: #ffffff55;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .total span:last-child {
+      font-size: 22px;
+      font-weight: 800;
+      color: #e50914;
+    }
+    .btn-pay {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #e50914, #8b0000);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px #e5091444;
+    }
+    .btn-pay:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    #error {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #2a1214;
+      border: 1px solid #e5091444;
+      color: #ffb4b4;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .hint {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #ffffff55;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .hint a { color: #e50914; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <h1>OWG</h1>
+      <p>Official Wrestling Group</p>
+    </div>
+
+    <p id="status">Cargando evento…</p>
+
+    <div id="event-card" class="card" hidden>
+      <h2 id="event-title"></h2>
+      <p id="event-meta"></p>
+      <p id="event-promo"></p>
+    </div>
+
+    <div class="card" id="tiers-card" hidden>
+      <p class="section-label">Zona de boleto</p>
+      <div id="tiers" class="tiers"></div>
+    </div>
+
+    <form id="checkout-form" class="card" hidden>
+      <p class="section-label">Tu correo</p>
+      <label for="email">Para enviarte el QR</label>
+      <input
+        id="email"
+        type="email"
+        name="email"
+        autocomplete="email"
+        placeholder="tu@correo.com"
+        required
+      >
+
+      <div class="row">
+        <div class="field">
+          <label for="quantity">Cantidad</label>
+          <input id="quantity" type="number" min="1" max="10" value="1" required>
+        </div>
+      </div>
+
+      <div class="total">
+        <span>Total</span>
+        <span id="total">$0.00</span>
+      </div>
+
+      <button type="submit" class="btn-pay" id="submit-btn" disabled>
+        PAGAR CON MERCADO PAGO
+      </button>
+      <p id="error" hidden></p>
+    </form>
+
+    <p class="hint">
+      Tras pagar recibirás un correo con tu QR para la entrada.
+      También puedes guardarlos en la <a href="/">app OWG</a>.
+    </p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/owg-app-config.js"></script>
+  <script src="/owg-supabase-config.js"></script>
+  <script src="/comprar/comprar.js"></script>
+</body>
+</html>
