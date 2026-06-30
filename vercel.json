@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/evento/:id",
+      "destination": "/evento/index.html?id=:id"
+    },
+    {
+      "source": "/comprar/:id",
+      "destination": "/comprar/index.html?id=:id"
+    }
+  ]
+}

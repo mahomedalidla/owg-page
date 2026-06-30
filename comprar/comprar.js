@@ -1,8 +1,6 @@
 (function () {
   'use strict';
 
-  var cfg = window.OWG_SUPABASE_CONFIG || {};
-
   var params = new URLSearchParams(window.location.search);
   var fromPath = window.location.pathname.match(/\/comprar\/(\d+)/);
   var eventId = params.get('id') || (fromPath ? fromPath[1] : null);
@@ -22,6 +20,47 @@
   var session = null;
   var eventData = null;
   var selectedTier = null;
+  var supabaseCfg = null;
+
+  function configValid(c) {
+    return c && c.url && c.anonKey && String(c.url).indexOf('TU_PROYECTO') < 0;
+  }
+
+  async function loadSupabaseConfig() {
+    if (supabaseCfg) return supabaseCfg;
+
+    var inline = window.OWG_SUPABASE_CONFIG;
+    if (configValid(inline)) {
+      supabaseCfg = { url: inline.url, anonKey: inline.anonKey };
+      return supabaseCfg;
+    }
+
+    var paths = ['/api/supabase-config', '../api/supabase-config'];
+    var lastMsg = '';
+    for (var i = 0; i < paths.length; i++) {
+      try {
+        var res = await fetch(paths[i]);
+        var data = {};
+        try {
+          data = await res.json();
+        } catch (_) {}
+        if (!res.ok) {
+          if (data.message) lastMsg = data.message;
+          continue;
+        }
+        if (configValid(data)) {
+          supabaseCfg = { url: data.url, anonKey: data.anonKey };
+          return supabaseCfg;
+        }
+      } catch (_) {}
+    }
+
+    throw new Error(
+      lastMsg ||
+        'Supabase no configurado. En Vercel: Settings → Environment Variables → ' +
+          'SUPABASE_URL y SUPABASE_ANON_KEY (anon/public), luego Redeploy.'
+    );
+  }
 
   function money(n) {
     return new Intl.NumberFormat('es-MX', {
@@ -131,15 +170,11 @@
   }
 
   async function ensureSupabase() {
-    if (!cfg.url || !cfg.anonKey || cfg.url.indexOf('TU_PROYECTO') >= 0) {
-      throw new Error(
-        'Falta configurar hosting/owg-supabase-config.js (copia desde owg-supabase-config.example.js).'
-      );
-    }
+    var c = await loadSupabaseConfig();
     if (!window.supabase || !window.supabase.createClient) {
       throw new Error('No se cargó la librería de Supabase.');
     }
-    supabase = window.supabase.createClient(cfg.url, cfg.anonKey);
+    supabase = window.supabase.createClient(c.url, c.anonKey);
     var existing = await supabase.auth.getSession();
     if (existing.data.session) {
       session = existing.data.session;
@@ -197,12 +232,13 @@
     elSubmit.textContent = 'Preparando pago…';
 
     try {
-      var fnUrl = cfg.url.replace(/\/$/, '') + '/functions/v1/crear-checkout-boleto';
+      var c = await loadSupabaseConfig();
+      var fnUrl = c.url.replace(/\/$/, '') + '/functions/v1/crear-checkout-boleto';
       var res = await fetch(fnUrl, {
         method: 'POST',
         headers: {
           Authorization: 'Bearer ' + session.access_token,
-          apikey: cfg.anonKey,
+          apikey: c.anonKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
