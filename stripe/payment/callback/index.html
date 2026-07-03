@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pago OWG</title>
+  <meta name="robots" content="noindex">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, sans-serif;
+      background: #0f0f12;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 420px;
+      background: #131316;
+      border: 1px solid #2a2a30;
+      border-radius: 12px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 14px 24px;
+      background: #e50914;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid #ffffff33;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      margin-top: 20px;
+    }
+    p { line-height: 1.5; color: #ffffffb3; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">OWG</h1>
+    <p id="status"></p>
+    <div class="actions" id="actions"></div>
+  </div>
+  <script>
+    (function () {
+      var params = window.location.search;
+      var status = new URLSearchParams(params).get('status') || 'success';
+      var orderId = new URLSearchParams(params).get('order_id') || '';
+      var titles = {
+        success: '¡Pago recibido!',
+        cancelled: 'Pago cancelado',
+        failure: 'Pago no completado'
+      };
+      document.getElementById('title').textContent = titles[status] || 'OWG';
+
+      var msg = document.getElementById('status');
+      var actions = document.getElementById('actions');
+
+      if (status === 'success') {
+        msg.textContent =
+          'Si el pago se confirmó, revisa tu correo: te enviamos tus boletos con QR. '
+          + 'También puedes mostrar ese QR en la entrada del evento.';
+      } else if (status === 'cancelled' || status === 'failure') {
+        msg.textContent =
+          'El pago no se completó. Puedes volver a intentar desde el enlace del evento.';
+      } else {
+        msg.textContent =
+          'Tu pago está en proceso. Cuando se confirme, recibirás el correo con tus boletos.';
+      }
+
+      var home = document.createElement('a');
+      home.className = 'btn btn-secondary';
+      home.href = 'https://owg-app.com';
+      home.textContent = 'Ir a owg-app.com';
+      actions.appendChild(home);
+
+      if (orderId) {
+        var boletos = document.createElement('a');
+        boletos.className = 'btn';
+        boletos.href = '/boletos/index.html?order=' + encodeURIComponent(orderId);
+        boletos.textContent = 'Ver en la app OWG';
+        actions.appendChild(boletos);
+      }
+    })();
+  </script>
+</body>
+</html>
