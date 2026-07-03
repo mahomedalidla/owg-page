@@ -21,9 +21,35 @@
   var eventData = null;
   var selectedTier = null;
   var supabaseCfg = null;
+  var PENDING_KEY = 'owg_boletaje_pago_pendiente';
+
+  function stripQuotes(s) {
+    return String(s).trim().replace(/^["']+|["']+$/g, '');
+  }
+
+  function normalizeUrl(raw) {
+    if (raw == null) return '';
+    var u = stripQuotes(raw);
+    if (!u) return '';
+    u = u.replace(/\\/g, '/');
+    if (u.indexOf('http://') !== 0 && u.indexOf('https://') !== 0) {
+      u = 'https://' + u.replace(/^\/+/, '');
+    }
+    return u.replace(/\/+$/, '');
+  }
+
+  function normalizeConfig(c) {
+    return {
+      url: normalizeUrl(c && c.url),
+      anonKey: stripQuotes(c && c.anonKey),
+    };
+  }
 
   function configValid(c) {
-    return c && c.url && c.anonKey && String(c.url).indexOf('TU_PROYECTO') < 0;
+    var n = normalizeConfig(c);
+    if (!n.url || !n.anonKey) return false;
+    if (n.url.indexOf('TU_PROYECTO') >= 0) return false;
+    return n.url.indexOf('http://') === 0 || n.url.indexOf('https://') === 0;
   }
 
   async function loadSupabaseConfig() {
@@ -31,7 +57,7 @@
 
     var inline = window.OWG_SUPABASE_CONFIG;
     if (configValid(inline)) {
-      supabaseCfg = { url: inline.url, anonKey: inline.anonKey };
+      supabaseCfg = normalizeConfig(inline);
       return supabaseCfg;
     }
 
@@ -49,16 +75,17 @@
           continue;
         }
         if (configValid(data)) {
-          supabaseCfg = { url: data.url, anonKey: data.anonKey };
+          supabaseCfg = normalizeConfig(data);
           return supabaseCfg;
         }
+        if (data.message) lastMsg = data.message;
       } catch (_) {}
     }
 
     throw new Error(
       lastMsg ||
-        'Supabase no configurado. En Vercel: Settings → Environment Variables → ' +
-          'SUPABASE_URL y SUPABASE_ANON_KEY (anon/public), luego Redeploy.'
+        'Supabase no configurado. En Vercel: SUPABASE_URL=https://xxx.supabase.co y ' +
+          'SUPABASE_ANON_KEY (sin comillas). Luego Redeploy.'
     );
   }
 
@@ -253,19 +280,30 @@
       if (!res.ok) {
         throw new Error(body.message || body.error || 'No se pudo iniciar el pago.');
       }
-      if (!body.init_point) {
-        throw new Error('Mercado Pago no devolvió enlace de pago.');
+      if (!body.checkout_url) {
+        throw new Error('Stripe no devolvió enlace de pago.');
       }
+
+      try {
+        localStorage.setItem(
+          PENDING_KEY,
+          JSON.stringify({
+            order_id: body.order_id,
+            event_title: eventData && eventData.title ? eventData.title : '',
+            started_at: new Date().toISOString(),
+          })
+        );
+      } catch (_) {}
 
       if (body.checkout_hint && body.sandbox) {
         alert(body.checkout_hint);
       }
 
-      window.location.href = body.init_point;
+      window.location.href = body.checkout_url;
     } catch (e) {
       showError(e.message || 'Error al iniciar el pago.');
       elSubmit.disabled = false;
-      elSubmit.textContent = 'PAGAR CON MERCADO PAGO';
+      elSubmit.textContent = 'PAGAR CON TARJETA';
     }
   }
 
