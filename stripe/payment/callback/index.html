@@ -3,37 +3,97 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pago OWG</title>
+  <title>Compra confirmada — OWG</title>
   <meta name="robots" content="noindex">
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: system-ui, sans-serif;
-      background: #0f0f12;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
       color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      padding: 24px 16px 40px;
     }
+    .wrap { max-width: 440px; margin: 0 auto; }
+    .brand { text-align: center; margin-bottom: 20px; }
+    .brand h1 { margin: 0; font-size: 26px; letter-spacing: 2px; }
     .card {
-      max-width: 420px;
       background: #131316;
       border: 1px solid #2a2a30;
-      border-radius: 12px;
-      padding: 28px 24px;
+      border-radius: 14px;
+      padding: 24px 20px;
       text-align: center;
+    }
+    .ok-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.15);
+      color: #4caf50;
+      font-size: 36px;
+      line-height: 64px;
+    }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: 1px;
+      font-weight: 800;
+    }
+    p { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 14px; }
+    .event-title {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .event-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #ffffff66;
+    }
+    .ticket-card {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #fff;
+      color: #0f0f12;
+    }
+    .ticket-card__label {
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: #666;
+    }
+    .ticket-card__tier {
+      margin: 4px 0 12px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #e50914;
+      letter-spacing: 0.5px;
+    }
+    .ticket-card__qr {
+      display: block;
+      margin: 0 auto;
+    }
+    .ticket-card__hint {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: #666;
     }
     .btn {
       display: inline-block;
-      margin-top: 12px;
-      padding: 14px 24px;
+      margin-top: 16px;
+      padding: 14px 22px;
       background: #e50914;
       color: #fff;
       text-decoration: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 700;
+      letter-spacing: 0.5px;
+      font-size: 14px;
     }
     .btn-secondary {
       background: transparent;
@@ -46,56 +106,71 @@
       align-items: center;
       margin-top: 20px;
     }
-    p { line-height: 1.5; color: #ffffffb3; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 16px;
+      border: 3px solid #ffffff22;
+      border-top-color: #e50914;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1 id="title">OWG</h1>
-    <p id="status"></p>
-    <div class="actions" id="actions"></div>
+  <div class="wrap">
+    <div class="brand"><h1>OWG</h1></div>
+
+    <div id="view-loading" class="card">
+      <div class="spinner"></div>
+      <h2>ASEGURANDO TUS LUGARES</h2>
+      <p>Confirmando el pago con Stripe…</p>
+    </div>
+
+    <div id="view-success" class="card" hidden>
+      <div class="ok-icon">✓</div>
+      <h2>¡PAGO EXITOSO!</h2>
+      <p id="email-note">Hemos enviado una copia a tu correo.</p>
+      <p class="event-title" id="event-title"></p>
+      <p class="event-meta" id="event-meta"></p>
+      <div id="tickets"></div>
+      <div class="actions">
+        <a id="open-app" class="btn" href="#">VER EN LA APP OWG</a>
+        <a class="btn btn-secondary" href="https://owg-app.com">Ir a owg-app.com</a>
+      </div>
+    </div>
+
+    <div id="view-pending" class="card" hidden>
+      <h2>PAGO EN PROCESO</h2>
+      <p>
+        Tu pago se está confirmando. En unos minutos llegará el correo con tus boletos y QR.
+        Si ya pagaste, revisa spam o abre la app.
+      </p>
+      <div class="actions">
+        <a id="open-app-pending" class="btn" href="#">ABRIR EN LA APP</a>
+      </div>
+    </div>
+
+    <div id="view-cancelled" class="card" hidden>
+      <h2>PAGO NO COMPLETADO</h2>
+      <p>Puedes volver al enlace del evento e intentar de nuevo.</p>
+      <div class="actions">
+        <a class="btn btn-secondary" href="https://owg-app.com">Ir a owg-app.com</a>
+      </div>
+    </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
   <script>
     (function () {
-      var params = window.location.search;
-      var status = new URLSearchParams(params).get('status') || 'success';
-      var orderId = new URLSearchParams(params).get('order_id') || '';
-      var titles = {
-        success: '¡Pago recibido!',
-        cancelled: 'Pago cancelado',
-        failure: 'Pago no completado'
-      };
-      document.getElementById('title').textContent = titles[status] || 'OWG';
-
-      var msg = document.getElementById('status');
-      var actions = document.getElementById('actions');
-
-      if (status === 'success') {
-        msg.textContent =
-          'Si el pago se confirmó, revisa tu correo: te enviamos tus boletos con QR. '
-          + 'También puedes mostrar ese QR en la entrada del evento.';
-      } else if (status === 'cancelled' || status === 'failure') {
-        msg.textContent =
-          'El pago no se completó. Puedes volver a intentar desde el enlace del evento.';
-      } else {
-        msg.textContent =
-          'Tu pago está en proceso. Cuando se confirme, recibirás el correo con tus boletos.';
-      }
-
-      var home = document.createElement('a');
-      home.className = 'btn btn-secondary';
-      home.href = 'https://owg-app.com';
-      home.textContent = 'Ir a owg-app.com';
-      actions.appendChild(home);
-
-      if (orderId) {
-        var boletos = document.createElement('a');
-        boletos.className = 'btn';
-        boletos.href = '/boletos/index.html?order=' + encodeURIComponent(orderId);
-        boletos.textContent = 'Ver en la app OWG';
-        actions.appendChild(boletos);
+      var order = new URLSearchParams(window.location.search).get('order_id') || '';
+      var pending = document.getElementById('open-app-pending');
+      if (pending && order) {
+        pending.href = '/boletos/index.html?order=' + encodeURIComponent(order);
       }
     })();
   </script>
+  <script src="/stripe/payment/callback/callback.js"></script>
 </body>
 </html>
