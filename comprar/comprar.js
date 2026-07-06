@@ -289,6 +289,7 @@
           PENDING_KEY,
           JSON.stringify({
             order_id: body.order_id,
+            session_id: body.session_id || '',
             event_title: eventData && eventData.title ? eventData.title : '',
             started_at: new Date().toISOString(),
           })

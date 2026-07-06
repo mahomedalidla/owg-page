@@ -145,10 +145,63 @@
       color: #ffffff99;
       line-height: 1.5;
     }
+    .signup-panel {
+      margin-top: 20px;
+      padding: 18px;
+      text-align: left;
+      background: #1a1a1f;
+      border-radius: 12px;
+      border: 1px solid #2a2a30;
+    }
+    .signup-panel h3 { margin: 0 0 8px; font-size: 18px; color: #fff; }
+    .signup-panel label {
+      display: block;
+      margin: 12px 0 4px;
+      font-size: 11px;
+      color: #ffffff66;
+      letter-spacing: 0.8px;
+    }
+    .signup-panel input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #2a2a30;
+      background: #0f0f12;
+      color: #fff;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .signup-panel input[readonly] { opacity: 0.75; }
+    .error-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(229, 9, 20, 0.12);
+      border: 1px solid rgba(229, 9, 20, 0.4);
+      color: #ff8a8a;
+      font-size: 13px;
+    }
+    .success-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(76, 175, 80, 0.12);
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      color: #a5d6a7;
+      font-size: 13px;
+    }
+    .btn-block {
+      display: block;
+      width: 100%;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+    }
+    [hidden] { display: none !important; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
-<body data-owg-callback-build="2026-07-06-v4">
+<body data-owg-callback-build="2026-07-06-v6">
   <div class="wrap">
     <div class="brand"><h1>OWG</h1></div>
 
@@ -165,14 +218,29 @@
       <p class="event-title" id="event-title"></p>
       <p class="event-meta" id="event-meta"></p>
       <div id="tickets"></div>
-      <div class="upsell">
-        <strong style="color:#fff;">⭐ Lleva tus boletos a todas partes</strong><br>
-        Guarda este y futuros boletos, recibe recordatorios y descubre funciones cerca de ti.
+      <div class="upsell" id="upsell-block">
+        <p id="upsell-text" style="margin:0;color:#fff;"><strong>⭐ Lleva tus boletos a todas partes</strong></p>
       </div>
       <div class="actions" id="success-actions">
-        <a id="btn-crear-cuenta" class="btn" href="#">GUARDAR BOLETO Y CREAR CUENTA</a>
-        <button type="button" id="btn-mis-boletos" class="btn-link">No gracias, solo ir a Mis Boletos</button>
+        <button type="button" id="btn-crear-cuenta" class="btn btn-block">GUARDAR BOLETO Y CREAR CUENTA</button>
+        <button type="button" id="btn-mis-boletos" class="btn-link">No gracias, solo ver mis boletos aquí</button>
         <a id="open-app" class="btn btn-secondary" href="#">ABRIR EN LA APP OWG</a>
+      </div>
+      <div id="signup-panel" class="signup-panel" hidden>
+        <h3>CREA TU CREDENCIAL</h3>
+        <p id="signup-intro" style="font-size:13px;color:#ffffff80;margin:0 0 4px;">Tus boletos se guardarán en esta cuenta OWG.</p>
+        <p id="mobile-download-row" hidden style="margin:0 0 12px;font-size:13px;">
+          <a id="mobile-download-link" href="#" style="color:#e50914;font-weight:700;">Descargar la app OWG</a>
+        </p>
+        <label for="reg-email">CORREO</label>
+        <input id="reg-email" type="email" readonly>
+        <label for="reg-nombre">APODO EN EL RING</label>
+        <input id="reg-nombre" type="text" autocomplete="name" placeholder="Tu apodo">
+        <label for="reg-pass">LLAVE SECRETA</label>
+        <input id="reg-pass" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+        <div id="signup-error" class="error-box" hidden></div>
+        <div id="signup-success" class="success-box" hidden></div>
+        <button type="button" class="btn btn-block" id="btn-registrar" style="margin-top:16px;">GUARDAR BOLETOS</button>
       </div>
     </div>
 
@@ -196,8 +264,11 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/owg-app-config.js"></script>
+  <script src="/shared/owg-device-flow.js"></script>
   <script>
-    /* owg-callback-build: 2026-07-06-v4 — QR vía qr_image del servidor (img, sin canvas) */
+    /* owg-callback-build: 2026-07-06-v6 — móvil→app, escritorio→solo web */
     (function () {
       'use strict';
 
@@ -228,7 +299,25 @@
       var elOpenApp = document.getElementById('open-app');
       var elBtnCrear = document.getElementById('btn-crear-cuenta');
       var elBtnMis = document.getElementById('btn-mis-boletos');
+      var elSignupPanel = document.getElementById('signup-panel');
+      var elRegEmail = document.getElementById('reg-email');
+      var elRegNombre = document.getElementById('reg-nombre');
+      var elRegPass = document.getElementById('reg-pass');
+      var elSignupError = document.getElementById('signup-error');
+      var elSignupSuccess = document.getElementById('signup-success');
+      var elSuccessActions = document.getElementById('success-actions');
       var recoveryEmail = '';
+      var supabase = null;
+
+      var flow = window.OwgDeviceFlow;
+
+      function isMobileWeb() {
+        return flow ? flow.isMobile() : /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+      }
+
+      function storeUrl() {
+        return flow ? flow.storeUrl() : 'https://play.google.com/store/apps/details?id=com.owg.app';
+      }
 
       var pending = document.getElementById('open-app-pending');
       if (pending && orderId) {
@@ -374,17 +463,152 @@
         return 'owg://boletos' + (suffix ? '?' + suffix : '');
       }
 
-      function setOpenAppLink() {
-        if (!orderId) return;
-        if (elOpenApp) elOpenApp.href = deepLink('');
-        if (elBtnCrear) elBtnCrear.href = boletosLandingUrl('crear-cuenta');
+      async function initSupabase(cfg) {
+        if (!window.supabase || !window.supabase.createClient) return;
+        supabase = window.supabase.createClient(cfg.url, cfg.anonKey);
       }
 
-      if (elBtnMis) {
-        elBtnMis.addEventListener('click', function () {
-          window.location.href = boletosLandingUrl('mis-boletos');
-        });
+      async function ensureSession() {
+        var existing = await supabase.auth.getSession();
+        if (existing.data.session) return existing.data.session;
+        var anon = await supabase.auth.signInAnonymously();
+        if (anon.error || !anon.data.session) throw new Error('No se pudo iniciar sesión.');
+        return anon.data.session;
       }
+
+      function showSignupPanel() {
+        if (!elSignupPanel) return;
+        if (elRegEmail && recoveryEmail) elRegEmail.value = recoveryEmail;
+        elSignupPanel.hidden = false;
+        if (elSuccessActions) elSuccessActions.hidden = true;
+        var dl = document.getElementById('mobile-download-link');
+        if (dl) dl.href = storeUrl();
+        if (flow) flow.aplicarUi(document);
+        elSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function onCrearCuenta() {
+        if (!isMobileWeb()) {
+          showSignupPanel();
+          return;
+        }
+        var link = deepLink('crear-cuenta');
+        if (flow) {
+          flow.tryAppThen(link, 1800, showSignupPanel);
+        } else {
+          window.location.href = link;
+          setTimeout(showSignupPanel, 1800);
+        }
+      }
+
+      function onMisBoletos() {
+        if (isMobileWeb()) {
+          var link = deepLink('mis-boletos');
+          if (flow) {
+            flow.tryAppThen(link, 1600, function () {
+              var tickets = document.getElementById('tickets');
+              if (tickets) tickets.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          }
+          return;
+        }
+        var tickets = document.getElementById('tickets');
+        if (tickets) tickets.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function onAbrirApp() {
+        if (!isMobileWeb() || !elOpenApp) return;
+        var link = deepLink('');
+        if (flow) {
+          flow.tryAppThen(link, 1500, function () {
+            window.location.href = storeUrl();
+          });
+        }
+      }
+
+      function showSignupError(msg) {
+        if (!elSignupError) return;
+        elSignupError.textContent = msg;
+        elSignupError.hidden = !msg;
+        if (elSignupSuccess) elSignupSuccess.hidden = true;
+      }
+
+      function showSignupOk(msg) {
+        if (!elSignupSuccess) return;
+        elSignupSuccess.textContent = msg;
+        elSignupSuccess.hidden = !msg;
+        if (elSignupError) elSignupError.hidden = true;
+      }
+
+      async function registrarCuenta() {
+        var email = (elRegEmail && elRegEmail.value || recoveryEmail || '').trim().toLowerCase();
+        var nombre = (elRegNombre && elRegNombre.value || '').trim();
+        var pass = (elRegPass && elRegPass.value || '').trim();
+        if (!email || email.indexOf('@') < 1) {
+          showSignupError('Indica un correo válido.');
+          return;
+        }
+        if (!nombre) {
+          showSignupError('Indica tu apodo.');
+          return;
+        }
+        if (pass.length < 6) {
+          showSignupError('La llave secreta debe tener al menos 6 caracteres.');
+          return;
+        }
+        showSignupError('');
+        var btn = document.getElementById('btn-registrar');
+        if (btn) btn.disabled = true;
+        try {
+          await ensureSession();
+          var user = (await supabase.auth.getUser()).data.user;
+          var response;
+          if (user && user.is_anonymous) {
+            response = await supabase.auth.updateUser({
+              email: email,
+              password: pass,
+              data: { name: nombre, recovery_email: email },
+            });
+            if (response.error) throw response.error;
+            try {
+              await supabase.rpc('completar_vinculacion_cuenta', { p_name: nombre });
+            } catch (_) {}
+          } else {
+            response = await supabase.auth.signUp({
+              email: email,
+              password: pass,
+              options: { data: { name: nombre, recovery_email: email } },
+            });
+            if (response.error) throw response.error;
+          }
+          await supabase.rpc('reclamar_boletos_por_email');
+          var okMsg = flow ? flow.textos().signupOk : '¡Cuenta lista! Tus boletos están guardados.';
+          showSignupOk(okMsg);
+        } catch (e) {
+          var msg = e && e.message ? e.message : 'No se pudo crear la cuenta.';
+          showSignupError(msg);
+        } finally {
+          if (btn) btn.disabled = false;
+        }
+      }
+
+      function aplicarUiPostCompra() {
+        if (flow) flow.aplicarUi(document);
+        var dl = document.getElementById('mobile-download-link');
+        if (dl) dl.href = storeUrl();
+        if (elOpenApp && isMobileWeb()) {
+          elOpenApp.addEventListener('click', function (e) {
+            e.preventDefault();
+            onAbrirApp();
+          });
+        }
+      }
+
+      if (elBtnCrear) elBtnCrear.addEventListener('click', onCrearCuenta);
+      if (elBtnMis) elBtnMis.addEventListener('click', onMisBoletos);
+
+      var btnReg = document.getElementById('btn-registrar');
+      if (btnReg) btnReg.addEventListener('click', registrarCuenta);
 
       async function pollConfirm(cfg, attempts) {
         var last = null;
@@ -407,7 +631,7 @@
 
       async function onSuccess() {
         show(elLoading);
-        setOpenAppLink();
+        aplicarUiPostCompra();
 
         if (!orderId || !sessionId) {
           show(elPending);
@@ -416,6 +640,7 @@
 
         try {
           var cfg = await loadSupabaseConfig();
+          await initSupabase(cfg);
           var data = await pollConfirm(cfg, 6);
 
           if (data && data.tickets && data.tickets.length > 0) {
@@ -431,7 +656,7 @@
             }
             if (elEmailNote) {
               recoveryEmail = data.recovery_email || '';
-              setOpenAppLink();
+              aplicarUiPostCompra();
               elEmailNote.textContent = recoveryEmail
                 ? 'También enviamos tus boletos a ' + recoveryEmail + '.'
                 : 'Revisa tu correo: ahí está la copia con QR.';
@@ -449,7 +674,7 @@
         }
       }
 
-      setOpenAppLink();
+      aplicarUiPostCompra();
       if (status === 'cancelled' || status === 'failure') {
         show(elCancelled);
       } else if (status === 'success') {

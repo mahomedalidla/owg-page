@@ -125,7 +125,7 @@
     [hidden] { display: none !important; }
   </style>
 </head>
-<body>
+<body data-owg-boletos-build="2026-07-06-v6">
   <div class="wrap">
     <div class="brand"><h1>OWG</h1></div>
 
@@ -143,16 +143,15 @@
       <p class="event-meta" id="event-meta"></p>
       <div id="tickets"></div>
       <div class="upsell" id="upsell">
-        <h3>⭐ Lleva tus boletos a todas partes</h3>
-        <ul style="margin:0;padding-left:18px;">
-          <li>Guarda este y futuros boletos en un solo lugar</li>
-          <li>Recibe recordatorios antes del evento</li>
-          <li>Descubre funciones cerca de ti</li>
-        </ul>
+        <p id="upsell-text" style="margin:0;">⭐ Lleva tus boletos a todas partes</p>
       </div>
       <div id="signup-panel" class="signup-panel" hidden>
         <h3>CREA TU CREDENCIAL</h3>
-        <p style="font-size:13px;color:#ffffff80;">Tus boletos se guardarán en esta cuenta.</p>
+        <p id="signup-intro" style="font-size:13px;color:#ffffff80;">Tus boletos se guardarán en esta cuenta.</p>
+        <p id="mobile-download-row" hidden style="margin:0 0 12px;font-size:13px;">
+          <a id="mobile-download-link" href="#" style="color:#e50914;font-weight:700;">Descargar la app OWG</a>
+          para llevar tus boletos en el celular.
+        </p>
         <label for="reg-email">CORREO</label>
         <input id="reg-email" type="email" readonly>
         <label for="reg-nombre">APODO EN EL RING</label>
@@ -181,6 +180,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/owg-app-config.js"></script>
+  <script src="/shared/owg-device-flow.js"></script>
   <script src="/boletos/boletos.js"></script>
 </body>
 </html>

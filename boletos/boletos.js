@@ -23,7 +23,6 @@
   var supabase = null;
   var orderData = null;
   var recoveryEmail = emailParam;
-  var appOpened = false;
 
   function hideAll() {
     [elLoading, elSuccess, elPending].forEach(function (el) {
@@ -99,23 +98,68 @@
     return 'owg://boletos' + (suffix ? '?' + suffix : '');
   }
 
+  var flow = window.OwgDeviceFlow;
+
+  function isMobileWeb() {
+    return flow ? flow.isMobile() : /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+  }
+
   function storeUrl() {
-    var cfg = window.OWG_APP_CONFIG || {};
-    var playStore = cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app';
-    var appStore = typeof cfg.appStoreUrl === 'function' ? cfg.appStoreUrl() : cfg.appStoreUrl;
-    return /iPhone|iPad|iPod/i.test(navigator.userAgent) ? appStore : playStore;
+    return flow ? flow.storeUrl() : 'https://play.google.com/store/apps/details?id=com.owg.app';
   }
 
-  function tryOpenApp(link) {
-    if (appOpened) return;
-    appOpened = true;
-    window.location.href = link;
+  function showSignupPanel() {
+    if (!elSignupPanel) return;
+    elSignupPanel.hidden = false;
+    if (elRegEmail && recoveryEmail) elRegEmail.value = recoveryEmail;
+    var btnCrear = document.getElementById('btn-crear-cuenta');
+    if (btnCrear) btnCrear.hidden = true;
+    var dl = document.getElementById('mobile-download-link');
+    if (dl) dl.href = storeUrl();
+    if (flow) flow.aplicarUi(document);
+    elSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function maybeAutoOpenApp() {
-    if (!orderId) return;
-    var link = deepLink({ accion: accion || 'crear-cuenta', email: recoveryEmail });
-    tryOpenApp(link);
+  function onCrearCuenta() {
+    if (!isMobileWeb()) {
+      showSignupPanel();
+      return;
+    }
+    var link = deepLink({ accion: 'crear-cuenta', email: recoveryEmail });
+    if (flow) {
+      flow.tryAppThen(link, 1800, showSignupPanel);
+    } else {
+      window.location.href = link;
+      setTimeout(showSignupPanel, 1800);
+    }
+  }
+
+  function onMisBoletos() {
+    if (isMobileWeb()) {
+      var link = deepLink({ accion: 'mis-boletos', email: recoveryEmail });
+      if (flow) {
+        flow.tryAppThen(link, 1600, function () {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      } else {
+        window.location.href = link;
+      }
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function onAbrirApp() {
+    if (!isMobileWeb()) return;
+    var link = deepLink({ email: recoveryEmail });
+    if (flow) {
+      flow.tryAppThen(link, 1500, function () {
+        window.location.href = storeUrl();
+      });
+    } else {
+      window.location.href = link;
+      setTimeout(function () { window.location.href = storeUrl(); }, 1500);
+    }
   }
 
   async function initSupabase() {
@@ -206,35 +250,6 @@
     });
   }
 
-  function showSignupPanel() {
-    if (!elSignupPanel) return;
-    elSignupPanel.hidden = false;
-    if (elRegEmail && recoveryEmail) elRegEmail.value = recoveryEmail;
-    elSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function onCrearCuenta() {
-    var link = deepLink({ accion: 'crear-cuenta', email: recoveryEmail });
-    tryOpenApp(link);
-    setTimeout(function () {
-      showSignupPanel();
-    }, 1400);
-  }
-
-  function onMisBoletos() {
-    var link = deepLink({ accion: 'mis-boletos', email: recoveryEmail });
-    tryOpenApp(link);
-    if (elSticky) elSticky.hidden = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function onAbrirApp() {
-    tryOpenApp(deepLink({ email: recoveryEmail }));
-    setTimeout(function () {
-      window.open(storeUrl(), '_blank');
-    }, 1500);
-  }
-
   function showSignupError(msg) {
     if (!elSignupError) return;
     elSignupError.textContent = msg;
@@ -296,7 +311,8 @@
       }
 
       await supabase.rpc('reclamar_boletos_por_email');
-      showSignupOk('¡Cuenta lista! Tus boletos están guardados en OWG.');
+      var okMsg = flow ? flow.textos().signupOk : '¡Cuenta lista! Tus boletos están guardados en OWG.';
+      showSignupOk(okMsg);
       if (elSticky) elSticky.hidden = true;
     } catch (e) {
       var msg = e && e.message ? e.message : 'No se pudo crear la cuenta.';
@@ -359,16 +375,18 @@
       }
 
       show(elSuccess);
+      if (flow) flow.aplicarUi(document);
+      var dl = document.getElementById('mobile-download-link');
+      if (dl) dl.href = storeUrl();
       if (elSticky) elSticky.hidden = false;
       requestAnimationFrame(function () {
         renderTickets(orderData);
       });
 
       if (accion === 'crear-cuenta') {
-        maybeAutoOpenApp();
-        setTimeout(showSignupPanel, accion === 'crear-cuenta' ? 1600 : 0);
+        onCrearCuenta();
       } else if (accion === 'mis-boletos') {
-        maybeAutoOpenApp();
+        onMisBoletos();
       }
     } catch (e) {
       console.error(e);
