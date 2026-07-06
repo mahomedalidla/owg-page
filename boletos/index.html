@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Abrir boletos en OWG…</title>
+  <title>Tus boletos — OWG</title>
   <meta name="robots" content="noindex">
   <meta property="og:title" content="Mis boletos — OWG">
   <meta property="og:description" content="Tus boletos con QR en la app oficial de lucha libre.">
@@ -15,94 +15,161 @@
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
       color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      padding: 24px 16px 120px;
     }
+    .wrap { max-width: 440px; margin: 0 auto; }
+    .brand { text-align: center; margin-bottom: 20px; }
+    .brand h1 { margin: 0; font-size: 26px; letter-spacing: 2px; }
     .card {
-      max-width: 420px;
-      width: 100%;
       background: #131316;
       border: 1px solid #2a2a30;
-      border-radius: 12px;
-      padding: 28px 24px;
+      border-radius: 14px;
+      padding: 24px 20px;
       text-align: center;
     }
-    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 2px; font-weight: 700; }
-    .sub { margin: 0 0 12px; color: #ffffff66; font-size: 13px; }
-    #status { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 15px; }
-    .btn {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 14px 24px;
-      background: #e50914;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      font-size: 15px;
+    .ok-icon {
+      width: 64px; height: 64px; margin: 0 auto 12px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.15);
+      color: #4caf50;
+      font-size: 36px; line-height: 64px;
     }
+    h2 { margin: 0 0 8px; font-size: 28px; letter-spacing: 1px; font-weight: 800; }
+    p { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 14px; }
+    .event-title { margin-top: 20px; font-size: 20px; font-weight: 700; color: #fff; }
+    .event-meta { margin-top: 6px; font-size: 12px; color: #ffffff66; }
+    .ticket-card {
+      margin-top: 18px; padding: 16px; border-radius: 12px;
+      background: #fff; color: #0f0f12;
+    }
+    .ticket-card__label { margin: 0; font-size: 11px; letter-spacing: 1px; color: #666; }
+    .ticket-card__tier { margin: 4px 0 12px; font-size: 18px; font-weight: 800; color: #e50914; }
+    .ticket-card__qr { display: block; margin: 0 auto; }
+    .ticket-card__hint { margin: 10px 0 0; font-size: 12px; color: #666; }
+    .upsell {
+      margin-top: 24px; padding: 18px; text-align: left;
+      background: #1a1a1f; border-radius: 12px; border: 1px solid #2a2a30;
+    }
+    .upsell h3 { margin: 0 0 12px; font-size: 16px; color: #fff; }
+    .upsell li { margin: 0 0 8px; font-size: 13px; color: #ffffff99; line-height: 1.45; }
+    .spinner {
+      width: 40px; height: 40px; margin: 0 auto 16px;
+      border: 3px solid #ffffff22;
+      border-top-color: #e50914;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sticky {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      padding: 16px 20px 28px;
+      background: linear-gradient(180deg, transparent 0%, #0f0f12 35%);
+    }
+    .sticky-inner { max-width: 440px; margin: 0 auto; }
+    .btn {
+      display: block; width: 100%;
+      padding: 14px 20px; margin-top: 10px;
+      background: #e50914; color: #fff; text-decoration: none;
+      border: none; border-radius: 10px;
+      font-weight: 700; font-size: 15px; letter-spacing: 0.5px;
+      cursor: pointer; text-align: center;
+    }
+    .btn:first-child { margin-top: 0; }
     .btn-secondary {
       background: transparent;
       border: 1px solid #ffffff33;
+      color: #ffffffb3;
+      font-size: 13px;
     }
-    .actions {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
+    .btn-link {
+      background: transparent; border: none; color: #ffffff66;
+      font-size: 13px; font-weight: 600; text-decoration: underline;
+      cursor: pointer; width: 100%; padding: 12px;
     }
-    .hint {
-      margin: 16px 0 0;
-      color: #ffffff55;
-      font-size: 12px;
-      line-height: 1.45;
+    .signup-panel {
+      margin-top: 20px; padding: 18px; text-align: left;
+      background: #1a1a1f; border-radius: 12px; border: 1px solid #2a2a30;
     }
+    .signup-panel h3 { margin: 0 0 8px; font-size: 18px; color: #fff; }
+    .signup-panel label { display: block; margin: 12px 0 4px; font-size: 11px; color: #ffffff66; letter-spacing: 0.8px; }
+    .signup-panel input {
+      width: 100%; padding: 12px 14px;
+      border-radius: 8px; border: 1px solid #2a2a30;
+      background: #0f0f12; color: #fff; font-size: 14px;
+    }
+    .signup-panel input[readonly] { opacity: 0.7; }
+    .error-box {
+      margin-top: 12px; padding: 10px 12px;
+      border-radius: 8px; background: rgba(229, 9, 20, 0.12);
+      border: 1px solid rgba(229, 9, 20, 0.4);
+      color: #ff8a8a; font-size: 13px;
+    }
+    .success-box {
+      margin-top: 12px; padding: 10px 12px;
+      border-radius: 8px; background: rgba(76, 175, 80, 0.12);
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      color: #a5d6a7; font-size: 13px;
+    }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>OWG</h1>
-    <p class="sub">Official Wrestling Group</p>
-    <p id="status">Abriendo tus boletos…</p>
-    <div class="actions" id="actions" style="display:none">
-      <a id="open-app" class="btn" href="#">📲 Abrir en OWG</a>
-      <a id="get-app" class="btn btn-secondary" href="#">Descargar la app</a>
+  <div class="wrap">
+    <div class="brand"><h1>OWG</h1></div>
+
+    <div id="view-loading" class="card">
+      <div class="spinner"></div>
+      <h2>CARGANDO TUS BOLETOS</h2>
+      <p>Un momento…</p>
     </div>
-    <p class="hint" id="hint">
-      También puedes mostrar el código QR del correo en la entrada del evento.
-    </p>
+
+    <div id="view-success" class="card" hidden>
+      <div class="ok-icon">✓</div>
+      <h2>¡LISTO!</h2>
+      <p id="subtitle">Tus boletos están aquí.</p>
+      <p class="event-title" id="event-title"></p>
+      <p class="event-meta" id="event-meta"></p>
+      <div id="tickets"></div>
+      <div class="upsell" id="upsell">
+        <h3>⭐ Lleva tus boletos a todas partes</h3>
+        <ul style="margin:0;padding-left:18px;">
+          <li>Guarda este y futuros boletos en un solo lugar</li>
+          <li>Recibe recordatorios antes del evento</li>
+          <li>Descubre funciones cerca de ti</li>
+        </ul>
+      </div>
+      <div id="signup-panel" class="signup-panel" hidden>
+        <h3>CREA TU CREDENCIAL</h3>
+        <p style="font-size:13px;color:#ffffff80;">Tus boletos se guardarán en esta cuenta.</p>
+        <label for="reg-email">CORREO</label>
+        <input id="reg-email" type="email" readonly>
+        <label for="reg-nombre">APODO EN EL RING</label>
+        <input id="reg-nombre" type="text" autocomplete="name" placeholder="Tu apodo">
+        <label for="reg-pass">LLAVE SECRETA</label>
+        <input id="reg-pass" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+        <div id="signup-error" class="error-box" hidden></div>
+        <div id="signup-success" class="success-box" hidden></div>
+        <button type="button" class="btn" id="btn-registrar" style="margin-top:16px;">GUARDAR BOLETOS</button>
+      </div>
+    </div>
+
+    <div id="view-pending" class="card" hidden>
+      <h2>BOLETOS EN CAMINO</h2>
+      <p>Tu pago puede estar confirmándose. Revisa tu correo en unos minutos o abre la app OWG.</p>
+    </div>
   </div>
+
+  <div class="sticky" id="sticky-bar" hidden>
+    <div class="sticky-inner">
+      <button type="button" class="btn" id="btn-crear-cuenta">GUARDAR BOLETO Y CREAR CUENTA</button>
+      <button type="button" class="btn btn-link" id="btn-mis-boletos">NO GRACIAS, SOLO IR A MIS BOLETOS</button>
+      <button type="button" class="btn btn-secondary" id="btn-abrir-app">ABRIR EN LA APP OWG</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
   <script src="/owg-app-config.js"></script>
-  <script>
-    (function () {
-      var cfg = window.OWG_APP_CONFIG || {};
-      var params = new URLSearchParams(window.location.search);
-      var order = params.get('order') || '';
-      var deepLink = 'owg://boletos' + (order ? '?order=' + encodeURIComponent(order) : '');
-      var playStore = cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app';
-      var appStore = typeof cfg.appStoreUrl === 'function' ? cfg.appStoreUrl() : cfg.appStoreUrl;
-
-      var status = document.getElementById('status');
-      var actions = document.getElementById('actions');
-      var openApp = document.getElementById('open-app');
-      var getApp = document.getElementById('get-app');
-
-      openApp.href = deepLink;
-      getApp.href = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? appStore : playStore;
-
-      function showActions() {
-        status.textContent = 'Toca el botón para ver tus boletos con QR en la app.';
-        actions.style.display = 'flex';
-      }
-
-      window.location.replace(deepLink);
-      setTimeout(showActions, 1200);
-      setTimeout(showActions, 2800);
-    })();
-  </script>
+  <script src="/boletos/boletos.js"></script>
 </body>
 </html>
