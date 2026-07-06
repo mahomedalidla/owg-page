@@ -122,10 +122,26 @@
       border: 1px solid rgba(76, 175, 80, 0.4);
       color: #a5d6a7; font-size: 13px;
     }
-    [hidden] { display: none !important; }
-  </style>
+    .hint-desktop {
+      margin: 14px 0 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #ffffff55;
+      text-align: center;
+    }
+    .email-sent {
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      background: #1a1a1f;
+      border-radius: 10px;
+      border: 1px solid #2a2a30;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #ffffffb3;
+      text-align: center;
+    }
 </head>
-<body data-owg-boletos-build="2026-07-06-v6">
+<body data-owg-boletos-build="2026-07-06-v7">
   <div class="wrap">
     <div class="brand"><h1>OWG</h1></div>
 
@@ -137,13 +153,18 @@
 
     <div id="view-success" class="card" hidden>
       <div class="ok-icon">✓</div>
-      <h2>¡LISTO!</h2>
+      <h2 id="page-headline">¡LISTO!</h2>
       <p id="subtitle">Tus boletos están aquí.</p>
       <p class="event-title" id="event-title"></p>
       <p class="event-meta" id="event-meta"></p>
       <div id="tickets"></div>
       <div class="upsell" id="upsell">
-        <p id="upsell-text" style="margin:0;">⭐ Lleva tus boletos a todas partes</p>
+        <p id="upsell-text" style="margin:0;"></p>
+      </div>
+      <div id="actions-desktop" hidden>
+        <p id="email-sent-note" class="email-sent" hidden></p>
+        <a id="btn-ir-correo" class="btn" href="#" target="_blank" rel="noopener noreferrer" hidden>REVISAR MI CORREO</a>
+        <p id="desktop-hint" class="hint-desktop" hidden></p>
       </div>
       <div id="signup-panel" class="signup-panel" hidden>
         <h3>CREA TU CREDENCIAL</h3>
@@ -171,10 +192,10 @@
   </div>
 
   <div class="sticky" id="sticky-bar" hidden>
-    <div class="sticky-inner">
-      <button type="button" class="btn" id="btn-crear-cuenta">GUARDAR BOLETO Y CREAR CUENTA</button>
-      <button type="button" class="btn btn-link" id="btn-mis-boletos">NO GRACIAS, SOLO IR A MIS BOLETOS</button>
-      <button type="button" class="btn btn-secondary" id="btn-abrir-app">ABRIR EN LA APP OWG</button>
+    <div class="sticky-inner" id="actions-mobile" hidden>
+      <button type="button" class="btn" id="btn-crear-cuenta">GUARDAR EN LA APP OWG</button>
+      <button type="button" class="btn btn-link" id="btn-mis-boletos">VER EL QR AQUÍ</button>
+      <button type="button" class="btn btn-secondary" id="btn-abrir-app">ABRIR O DESCARGAR OWG</button>
     </div>
   </div>
 

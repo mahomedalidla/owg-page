@@ -198,10 +198,28 @@
       cursor: pointer;
     }
     [hidden] { display: none !important; }
+    .hint-desktop {
+      margin: 14px 0 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #ffffff55;
+      text-align: center;
+    }
+    .email-sent {
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      background: #1a1a1f;
+      border-radius: 10px;
+      border: 1px solid #2a2a30;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #ffffffb3;
+      text-align: center;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
-<body data-owg-callback-build="2026-07-06-v6">
+<body data-owg-callback-build="2026-07-06-v7">
   <div class="wrap">
     <div class="brand"><h1>OWG</h1></div>
 
@@ -213,18 +231,23 @@
 
     <div id="view-success" class="card" hidden>
       <div class="ok-icon">✓</div>
-      <h2>¡PAGO EXITOSO!</h2>
+      <h2 id="page-headline">¡PAGO EXITOSO!</h2>
       <p id="email-note">Hemos enviado una copia a tu correo.</p>
       <p class="event-title" id="event-title"></p>
       <p class="event-meta" id="event-meta"></p>
       <div id="tickets"></div>
       <div class="upsell" id="upsell-block">
-        <p id="upsell-text" style="margin:0;color:#fff;"><strong>⭐ Lleva tus boletos a todas partes</strong></p>
+        <p id="upsell-text" style="margin:0;"></p>
       </div>
-      <div class="actions" id="success-actions">
-        <button type="button" id="btn-crear-cuenta" class="btn btn-block">GUARDAR BOLETO Y CREAR CUENTA</button>
-        <button type="button" id="btn-mis-boletos" class="btn-link">No gracias, solo ver mis boletos aquí</button>
-        <a id="open-app" class="btn btn-secondary" href="#">ABRIR EN LA APP OWG</a>
+      <div id="actions-desktop" hidden>
+        <p id="email-sent-note" class="email-sent" hidden></p>
+        <a id="btn-ir-correo" class="btn btn-block" href="#" target="_blank" rel="noopener noreferrer" hidden>REVISAR MI CORREO</a>
+        <p id="desktop-hint" class="hint-desktop" hidden></p>
+      </div>
+      <div class="actions" id="actions-mobile" hidden>
+        <button type="button" id="btn-crear-cuenta" class="btn btn-block">GUARDAR EN LA APP OWG</button>
+        <button type="button" id="btn-mis-boletos" class="btn-link">VER EL QR AQUÍ</button>
+        <a id="open-app" class="btn btn-secondary" href="#">ABRIR O DESCARGAR OWG</a>
       </div>
       <div id="signup-panel" class="signup-panel" hidden>
         <h3>CREA TU CREDENCIAL</h3>
@@ -248,7 +271,7 @@
       <h2>PAGO EN PROCESO</h2>
       <p>
         Tu pago se está confirmando. En unos minutos llegará el correo con tus boletos y QR.
-        Si ya pagaste, revisa spam o abre la app.
+        Si ya pagaste, revisa tu bandeja o la carpeta de spam.
       </p>
       <div class="actions">
         <a id="open-app-pending" class="btn" href="#">ABRIR EN LA APP</a>
@@ -268,7 +291,7 @@
   <script src="/owg-app-config.js"></script>
   <script src="/shared/owg-device-flow.js"></script>
   <script>
-    /* owg-callback-build: 2026-07-06-v6 — móvil→app, escritorio→solo web */
+    /* owg-callback-build: 2026-07-06-v7 */
     (function () {
       'use strict';
 
@@ -305,7 +328,7 @@
       var elRegPass = document.getElementById('reg-pass');
       var elSignupError = document.getElementById('signup-error');
       var elSignupSuccess = document.getElementById('signup-success');
-      var elSuccessActions = document.getElementById('success-actions');
+      var elSuccessActions = document.getElementById('actions-mobile');
       var recoveryEmail = '';
       var supabase = null;
 
@@ -477,21 +500,18 @@
       }
 
       function showSignupPanel() {
-        if (!elSignupPanel) return;
+        if (!elSignupPanel || !isMobileWeb()) return;
         if (elRegEmail && recoveryEmail) elRegEmail.value = recoveryEmail;
         elSignupPanel.hidden = false;
         if (elSuccessActions) elSuccessActions.hidden = true;
         var dl = document.getElementById('mobile-download-link');
         if (dl) dl.href = storeUrl();
-        if (flow) flow.aplicarUi(document);
+        if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail });
         elSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function onCrearCuenta() {
-        if (!isMobileWeb()) {
-          showSignupPanel();
-          return;
-        }
+        if (!isMobileWeb()) return;
         var link = deepLink('crear-cuenta');
         if (flow) {
           flow.tryAppThen(link, 1800, showSignupPanel);
@@ -593,7 +613,7 @@
       }
 
       function aplicarUiPostCompra() {
-        if (flow) flow.aplicarUi(document);
+        if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail });
         var dl = document.getElementById('mobile-download-link');
         if (dl) dl.href = storeUrl();
         if (elOpenApp && isMobileWeb()) {
@@ -654,13 +674,12 @@
                 data.event.city,
               ].filter(Boolean).join(' · ');
             }
-            if (elEmailNote) {
+            if (elEmailNote && !recoveryEmail) {
               recoveryEmail = data.recovery_email || '';
-              aplicarUiPostCompra();
-              elEmailNote.textContent = recoveryEmail
-                ? 'También enviamos tus boletos a ' + recoveryEmail + '.'
-                : 'Revisa tu correo: ahí está la copia con QR.';
+            } else if (data.recovery_email) {
+              recoveryEmail = data.recovery_email;
             }
+            aplicarUiPostCompra();
             show(elSuccess);
             requestAnimationFrame(function () { renderTickets(data); });
             try { localStorage.removeItem(PENDING_KEY); } catch (_) {}

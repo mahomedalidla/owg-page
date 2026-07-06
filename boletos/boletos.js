@@ -121,10 +121,7 @@
   }
 
   function onCrearCuenta() {
-    if (!isMobileWeb()) {
-      showSignupPanel();
-      return;
-    }
+    if (!isMobileWeb()) return;
     var link = deepLink({ accion: 'crear-cuenta', email: recoveryEmail });
     if (flow) {
       flow.tryAppThen(link, 1800, showSignupPanel);
@@ -375,15 +372,16 @@
       }
 
       show(elSuccess);
-      if (flow) flow.aplicarUi(document);
+      if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail });
       var dl = document.getElementById('mobile-download-link');
       if (dl) dl.href = storeUrl();
-      if (elSticky) elSticky.hidden = false;
       requestAnimationFrame(function () {
         renderTickets(orderData);
       });
 
-      if (accion === 'crear-cuenta') {
+      if (accion === 'app') {
+        if (isMobileWeb()) onAbrirApp();
+      } else if (accion === 'crear-cuenta' && isMobileWeb()) {
         onCrearCuenta();
       } else if (accion === 'mis-boletos') {
         onMisBoletos();
