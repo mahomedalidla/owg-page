@@ -219,7 +219,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
-<body data-owg-callback-build="2026-07-06-v7">
+<body data-owg-callback-build="2026-07-06-v8">
   <div class="wrap">
     <div class="brand"><h1>OWG</h1></div>
 
@@ -245,9 +245,8 @@
         <p id="desktop-hint" class="hint-desktop" hidden></p>
       </div>
       <div class="actions" id="actions-mobile" hidden>
-        <button type="button" id="btn-crear-cuenta" class="btn btn-block">GUARDAR EN LA APP OWG</button>
-        <button type="button" id="btn-mis-boletos" class="btn-link">VER EL QR AQUÍ</button>
-        <a id="open-app" class="btn btn-secondary" href="#">ABRIR O DESCARGAR OWG</a>
+        <button type="button" id="btn-crear-cuenta" class="btn btn-block">GUARDAR BOLETO Y CREAR CUENTA</button>
+        <a id="open-app" class="btn btn-secondary" href="#">DESCARGAR O ABRIR LA APP</a>
       </div>
       <div id="signup-panel" class="signup-panel" hidden>
         <h3>CREA TU CREDENCIAL</h3>
@@ -291,7 +290,7 @@
   <script src="/owg-app-config.js"></script>
   <script src="/shared/owg-device-flow.js"></script>
   <script>
-    /* owg-callback-build: 2026-07-06-v7 */
+    /* owg-callback-build: 2026-07-06-v8 */
     (function () {
       'use strict';
 
@@ -321,14 +320,12 @@
       var elEmailNote = document.getElementById('email-note');
       var elOpenApp = document.getElementById('open-app');
       var elBtnCrear = document.getElementById('btn-crear-cuenta');
-      var elBtnMis = document.getElementById('btn-mis-boletos');
       var elSignupPanel = document.getElementById('signup-panel');
       var elRegEmail = document.getElementById('reg-email');
       var elRegNombre = document.getElementById('reg-nombre');
       var elRegPass = document.getElementById('reg-pass');
       var elSignupError = document.getElementById('signup-error');
       var elSignupSuccess = document.getElementById('signup-success');
-      var elSuccessActions = document.getElementById('actions-mobile');
       var recoveryEmail = '';
       var supabase = null;
 
@@ -503,10 +500,9 @@
         if (!elSignupPanel || !isMobileWeb()) return;
         if (elRegEmail && recoveryEmail) elRegEmail.value = recoveryEmail;
         elSignupPanel.hidden = false;
-        if (elSuccessActions) elSuccessActions.hidden = true;
+        if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail, signupOpen: true });
         var dl = document.getElementById('mobile-download-link');
         if (dl) dl.href = storeUrl();
-        if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail });
         elSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
@@ -519,21 +515,6 @@
           window.location.href = link;
           setTimeout(showSignupPanel, 1800);
         }
-      }
-
-      function onMisBoletos() {
-        if (isMobileWeb()) {
-          var link = deepLink('mis-boletos');
-          if (flow) {
-            flow.tryAppThen(link, 1600, function () {
-              var tickets = document.getElementById('tickets');
-              if (tickets) tickets.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-          }
-          return;
-        }
-        var tickets = document.getElementById('tickets');
-        if (tickets) tickets.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function onAbrirApp() {
@@ -625,7 +606,6 @@
       }
 
       if (elBtnCrear) elBtnCrear.addEventListener('click', onCrearCuenta);
-      if (elBtnMis) elBtnMis.addEventListener('click', onMisBoletos);
 
       var btnReg = document.getElementById('btn-registrar');
       if (btnReg) btnReg.addEventListener('click', registrarCuenta);

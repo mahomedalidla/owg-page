@@ -109,14 +109,12 @@
   }
 
   function showSignupPanel() {
-    if (!elSignupPanel) return;
+    if (!elSignupPanel || !isMobileWeb()) return;
     elSignupPanel.hidden = false;
     if (elRegEmail && recoveryEmail) elRegEmail.value = recoveryEmail;
-    var btnCrear = document.getElementById('btn-crear-cuenta');
-    if (btnCrear) btnCrear.hidden = true;
     var dl = document.getElementById('mobile-download-link');
     if (dl) dl.href = storeUrl();
-    if (flow) flow.aplicarUi(document);
+    if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail, signupOpen: true });
     elSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -333,11 +331,9 @@
 
   function bindActions() {
     var btnCrear = document.getElementById('btn-crear-cuenta');
-    var btnMis = document.getElementById('btn-mis-boletos');
     var btnApp = document.getElementById('btn-abrir-app');
     var btnReg = document.getElementById('btn-registrar');
     if (btnCrear) btnCrear.addEventListener('click', onCrearCuenta);
-    if (btnMis) btnMis.addEventListener('click', onMisBoletos);
     if (btnApp) btnApp.addEventListener('click', onAbrirApp);
     if (btnReg) btnReg.addEventListener('click', registrarCuenta);
   }

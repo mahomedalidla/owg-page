@@ -73,11 +73,11 @@
         headline: '¡LISTO!',
         subtitle: 'Tu boleto también está en el correo.',
         upsell:
-          '<strong style="color:#fff">Llévalo en el bolsillo.</strong> En la app OWG tienes el QR a mano, recordatorios y tu historial de eventos.',
-        crearCuenta: 'GUARDAR EN LA APP OWG',
-        misBoletos: 'VER EL QR AQUÍ',
-        abrirApp: 'ABRIR O DESCARGAR OWG',
-        signupIntro: 'Si prefieres no instalar ahora, crea tu cuenta aquí:',
+          '<strong style="color:#fff">Llévalo en el bolsillo.</strong> Guarda tus boletos en la app OWG: QR a mano, recordatorios y tu historial de eventos.',
+        crearCuenta: 'GUARDAR BOLETO Y CREAR CUENTA',
+        misBoletos: null,
+        abrirApp: 'DESCARGAR O ABRIR LA APP',
+        signupIntro: 'Crea tu cuenta OWG y tus boletos quedarán guardados aquí:',
         signupOk: '¡Listo! Tus boletos quedaron en tu cuenta OWG.',
       };
     }
@@ -100,12 +100,13 @@
 
   /**
    * @param {Document|Element} root
-   * @param {{ recoveryEmail?: string }} ctx
+   * @param {{ recoveryEmail?: string, signupOpen?: boolean }} ctx
    */
   function aplicarUi(root, ctx) {
     root = root || document;
     ctx = ctx || {};
     var email = String(ctx.recoveryEmail || '').trim();
+    var signupOpen = !!ctx.signupOpen;
     var mobile = isMobile();
     var t = textos();
 
@@ -124,8 +125,8 @@
     var signup = root.getElementById('signup-panel');
 
     if (desktopActions) desktopActions.hidden = mobile;
-    if (mobileActions) mobileActions.hidden = !mobile;
-    if (sticky) sticky.hidden = !mobile;
+    if (mobileActions) mobileActions.hidden = !mobile || signupOpen;
+    if (sticky) sticky.hidden = !mobile || signupOpen;
     if (signup && !mobile) signup.hidden = true;
 
     var emailSent = root.getElementById('email-sent-note');
