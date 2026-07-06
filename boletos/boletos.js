@@ -156,60 +156,53 @@
     return body;
   }
 
-  function renderQrInto(host, value) {
-    if (!host || !value) return;
-    var text = String(value).trim();
-    if (!text) return;
-
-    function showFallback(msg) {
-      host.innerHTML =
-        '<p style="margin:0;font-size:12px;color:#666;">' + escapeHtml(msg) + '</p>';
-    }
-
-    if (!window.QRCode) {
-      showFallback('No se pudo cargar el generador de QR.');
-      return;
-    }
-
-    window.QRCode.toDataURL(
-      text,
-      {
-        width: 220,
-        margin: 1,
-        color: { dark: '#0F0F12', light: '#FFFFFF' },
-        errorCorrectionLevel: 'M',
-      },
-      function (err, url) {
-        if (err || !url) {
-          showFallback('No se pudo generar el QR. Usa el correo o la app.');
-          return;
-        }
-        var img = document.createElement('img');
-        img.src = url;
-        img.alt = 'Código QR del boleto';
-        img.className = 'ticket-card__qr';
-        img.width = 220;
-        img.height = 220;
-        host.appendChild(img);
-      }
-    );
-  }
-
   function renderTickets(data) {
     if (!elTickets) return;
     elTickets.innerHTML = '';
     var tickets = Array.isArray(data.tickets) ? data.tickets : [];
+    if (tickets.length === 0) return;
+
     tickets.forEach(function (ticket, index) {
-      var hostId = 'qr-host-' + index;
       var card = document.createElement('div');
       card.className = 'ticket-card';
-      card.innerHTML =
-        '<p class="ticket-card__label">BOLETO ' + (index + 1) + '</p>' +
-        '<p class="ticket-card__tier">' + escapeHtml(ticket.tier_name || 'General') + '</p>' +
-        '<div id="' + hostId + '" class="ticket-card__qr-wrap"></div>' +
-        '<p class="ticket-card__hint">Presenta este código en la entrada.</p>';
+
+      var label = document.createElement('p');
+      label.className = 'ticket-card__label';
+      label.textContent = 'BOLETO ' + (index + 1);
+
+      var tier = document.createElement('p');
+      tier.className = 'ticket-card__tier';
+      tier.textContent = ticket.tier_name || 'General';
+
+      var wrap = document.createElement('div');
+      wrap.className = 'ticket-card__qr-wrap';
+
+      if (ticket.qr_image) {
+        var img = document.createElement('img');
+        img.src = ticket.qr_image;
+        img.alt = 'Código QR del boleto';
+        img.className = 'ticket-card__qr';
+        img.width = 220;
+        img.height = 220;
+        wrap.appendChild(img);
+      } else {
+        var fallback = document.createElement('p');
+        fallback.style.cssText = 'margin:0;font-size:12px;color:#666;text-align:center;';
+        fallback.textContent = ticket.qr_code
+          ? 'QR en tu correo. Recarga la página en unos segundos.'
+          : 'Generando QR… recarga en unos segundos.';
+        wrap.appendChild(fallback);
+      }
+
+      var hint = document.createElement('p');
+      hint.className = 'ticket-card__hint';
+      hint.textContent = 'Presenta este código en la entrada.';
+
+      card.appendChild(label);
+      card.appendChild(tier);
+      card.appendChild(wrap);
+      card.appendChild(hint);
       elTickets.appendChild(card);
-      renderQrInto(document.getElementById(hostId), ticket.qr_code);
     });
   }
 
