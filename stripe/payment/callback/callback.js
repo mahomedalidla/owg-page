@@ -1,5 +1,7 @@
+/* owg-callback-build: 2026-07-06-v4 — respaldo si HTML cacheado aún carga este archivo */
 (function () {
   'use strict';
+  if (document.body && document.body.getAttribute('data-owg-callback-build')) return;
 
   var params = new URLSearchParams(window.location.search);
   var status = params.get('status') || 'success';
@@ -26,6 +28,9 @@
   var elEventMeta = document.getElementById('event-meta');
   var elEmailNote = document.getElementById('email-note');
   var elOpenApp = document.getElementById('open-app');
+  var elBtnCrear = document.getElementById('btn-crear-cuenta');
+  var elBtnMis = document.getElementById('btn-mis-boletos');
+  var recoveryEmail = '';
 
   function hideAll() {
     [elLoading, elSuccess, elPending, elCancelled].forEach(function (el) {
@@ -83,14 +88,6 @@
     }
   }
 
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
   async function confirmarPagoWeb(cfg) {
     var fnUrl = cfg.url + '/functions/v1/confirmar-pago-boleto-web';
     var res = await fetch(fnUrl, {
@@ -100,26 +97,13 @@
         Authorization: 'Bearer ' + cfg.anonKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        order_id: orderId,
-        session_id: sessionId,
-      }),
+      body: JSON.stringify({ order_id: orderId, session_id: sessionId }),
     });
     var body = await res.json();
     if (!res.ok) {
       throw new Error(body.message || body.error || 'No se pudo confirmar el pago.');
     }
     return body;
-  }
-
-  function renderQr(canvasId, value) {
-    var canvas = document.getElementById(canvasId);
-    if (!canvas || !window.QRCode || !value) return;
-    window.QRCode.toCanvas(canvas, value, {
-      width: 200,
-      margin: 1,
-      color: { dark: '#0F0F12', light: '#FFFFFF' },
-    });
   }
 
   function renderTickets(data) {
@@ -129,22 +113,74 @@
     if (tickets.length === 0) return;
 
     tickets.forEach(function (ticket, index) {
-      var canvasId = 'qr-' + index;
       var card = document.createElement('div');
       card.className = 'ticket-card';
-      card.innerHTML =
-        '<p class="ticket-card__label">BOLETO ' + (index + 1) + '</p>' +
-        '<p class="ticket-card__tier">' + escapeHtml(ticket.tier_name || 'General') + '</p>' +
-        '<canvas id="' + canvasId + '" class="ticket-card__qr"></canvas>' +
-        '<p class="ticket-card__hint">Presenta este código en la entrada.</p>';
+
+      var label = document.createElement('p');
+      label.className = 'ticket-card__label';
+      label.textContent = 'BOLETO ' + (index + 1);
+
+      var tier = document.createElement('p');
+      tier.className = 'ticket-card__tier';
+      tier.textContent = ticket.tier_name || 'General';
+
+      var wrap = document.createElement('div');
+      wrap.className = 'ticket-card__qr-wrap';
+
+      if (ticket.qr_image) {
+        var img = document.createElement('img');
+        img.src = ticket.qr_image;
+        img.alt = 'Código QR del boleto';
+        img.className = 'ticket-card__qr';
+        img.width = 220;
+        img.height = 220;
+        wrap.appendChild(img);
+      } else {
+        var fallback = document.createElement('p');
+        fallback.style.cssText = 'margin:0;font-size:12px;color:#666;text-align:center;';
+        fallback.textContent = 'Actualiza confirmar-pago-boleto-web en Supabase y recarga.';
+        wrap.appendChild(fallback);
+      }
+
+      var hint = document.createElement('p');
+      hint.className = 'ticket-card__hint';
+      hint.textContent = 'Presenta este código en la entrada.';
+
+      card.appendChild(label);
+      card.appendChild(tier);
+      card.appendChild(wrap);
+      card.appendChild(hint);
       elTickets.appendChild(card);
-      renderQr(canvasId, ticket.qr_code);
     });
   }
 
+  function boletosLandingUrl(accion) {
+    var q = new URLSearchParams();
+    if (orderId) q.set('order', orderId);
+    if (accion) q.set('accion', accion);
+    if (recoveryEmail) q.set('email', recoveryEmail);
+    return '/boletos/index.html?' + q.toString();
+  }
+
+  function deepLink(accion) {
+    var q = new URLSearchParams();
+    if (orderId) q.set('order', orderId);
+    if (accion) q.set('accion', accion);
+    if (recoveryEmail) q.set('email', recoveryEmail);
+    var suffix = q.toString();
+    return 'owg://boletos' + (suffix ? '?' + suffix : '');
+  }
+
   function setOpenAppLink() {
-    if (!elOpenApp || !orderId) return;
-    elOpenApp.href = '/boletos/index.html?order=' + encodeURIComponent(orderId);
+    if (!orderId) return;
+    if (elOpenApp) elOpenApp.href = deepLink('');
+    if (elBtnCrear) elBtnCrear.href = boletosLandingUrl('crear-cuenta');
+  }
+
+  if (elBtnMis) {
+    elBtnMis.addEventListener('click', function () {
+      window.location.href = boletosLandingUrl('mis-boletos');
+    });
   }
 
   async function pollConfirm(cfg, attempts) {
@@ -157,9 +193,7 @@
           await new Promise(function (r) { setTimeout(r, 1500); });
           continue;
         }
-        if (last.payment_status && last.payment_status !== 'paid') {
-          return last;
-        }
+        if (last.payment_status && last.payment_status !== 'paid') return last;
       } catch (e) {
         if (i === attempts - 1) throw e;
       }
@@ -193,20 +227,15 @@
           ].filter(Boolean).join(' · ');
         }
         if (elEmailNote) {
-          var email = data.recovery_email || '';
-          elEmailNote.textContent = email
-            ? 'También enviamos tus boletos a ' + email + '.'
+          recoveryEmail = data.recovery_email || '';
+          setOpenAppLink();
+          elEmailNote.textContent = recoveryEmail
+            ? 'También enviamos tus boletos a ' + recoveryEmail + '.'
             : 'Revisa tu correo: ahí está la copia con QR.';
-          if (data.email_skipped === 'resend_not_configured') {
-            elEmailNote.textContent =
-              'Guarda esta pantalla o abre la app: el correo puede tardar unos minutos.';
-          }
         }
-        renderTickets(data);
-        try {
-          localStorage.removeItem(PENDING_KEY);
-        } catch (_) {}
         show(elSuccess);
+        requestAnimationFrame(function () { renderTickets(data); });
+        try { localStorage.removeItem(PENDING_KEY); } catch (_) {}
         return;
       }
 
@@ -219,17 +248,14 @@
 
   function init() {
     setOpenAppLink();
-
     if (status === 'cancelled' || status === 'failure') {
       show(elCancelled);
       return;
     }
-
     if (status === 'success') {
       onSuccess();
       return;
     }
-
     show(elPending);
   }
 
