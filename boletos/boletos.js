@@ -156,14 +156,43 @@
     return body;
   }
 
-  function renderQr(canvasId, value) {
-    var canvas = document.getElementById(canvasId);
-    if (!canvas || !window.QRCode || !value) return;
-    window.QRCode.toCanvas(canvas, value, {
-      width: 200,
-      margin: 1,
-      color: { dark: '#0F0F12', light: '#FFFFFF' },
-    });
+  function renderQrInto(host, value) {
+    if (!host || !value) return;
+    var text = String(value).trim();
+    if (!text) return;
+
+    function showFallback(msg) {
+      host.innerHTML =
+        '<p style="margin:0;font-size:12px;color:#666;">' + escapeHtml(msg) + '</p>';
+    }
+
+    if (!window.QRCode) {
+      showFallback('No se pudo cargar el generador de QR.');
+      return;
+    }
+
+    window.QRCode.toDataURL(
+      text,
+      {
+        width: 220,
+        margin: 1,
+        color: { dark: '#0F0F12', light: '#FFFFFF' },
+        errorCorrectionLevel: 'M',
+      },
+      function (err, url) {
+        if (err || !url) {
+          showFallback('No se pudo generar el QR. Usa el correo o la app.');
+          return;
+        }
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Código QR del boleto';
+        img.className = 'ticket-card__qr';
+        img.width = 220;
+        img.height = 220;
+        host.appendChild(img);
+      }
+    );
   }
 
   function renderTickets(data) {
@@ -171,16 +200,16 @@
     elTickets.innerHTML = '';
     var tickets = Array.isArray(data.tickets) ? data.tickets : [];
     tickets.forEach(function (ticket, index) {
-      var canvasId = 'qr-' + index;
+      var hostId = 'qr-host-' + index;
       var card = document.createElement('div');
       card.className = 'ticket-card';
       card.innerHTML =
         '<p class="ticket-card__label">BOLETO ' + (index + 1) + '</p>' +
         '<p class="ticket-card__tier">' + escapeHtml(ticket.tier_name || 'General') + '</p>' +
-        '<canvas id="' + canvasId + '" class="ticket-card__qr"></canvas>' +
+        '<div id="' + hostId + '" class="ticket-card__qr-wrap"></div>' +
         '<p class="ticket-card__hint">Presenta este código en la entrada.</p>';
       elTickets.appendChild(card);
-      renderQr(canvasId, ticket.qr_code);
+      renderQrInto(document.getElementById(hostId), ticket.qr_code);
     });
   }
 
@@ -336,9 +365,11 @@
         ].filter(Boolean).join(' · ');
       }
 
-      renderTickets(orderData);
       show(elSuccess);
       if (elSticky) elSticky.hidden = false;
+      requestAnimationFrame(function () {
+        renderTickets(orderData);
+      });
 
       if (accion === 'crear-cuenta') {
         maybeAutoOpenApp();

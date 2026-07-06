@@ -44,7 +44,19 @@
     }
     .ticket-card__label { margin: 0; font-size: 11px; letter-spacing: 1px; color: #666; }
     .ticket-card__tier { margin: 4px 0 12px; font-size: 18px; font-weight: 800; color: #e50914; }
-    .ticket-card__qr { display: block; margin: 0 auto; }
+    .ticket-card__qr,
+    .ticket-card__qr-wrap img {
+      display: block;
+      margin: 0 auto;
+      width: 220px;
+      height: 220px;
+    }
+    .ticket-card__qr-wrap {
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .ticket-card__hint { margin: 10px 0 0; font-size: 12px; color: #666; }
     .upsell {
       margin-top: 24px; padding: 18px; text-align: left;
