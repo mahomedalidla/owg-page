@@ -7,200 +7,71 @@
   <meta name="robots" content="noindex">
   <meta property="og:title" content="Mis boletos — OWG">
   <meta property="og:description" content="Tus boletos con QR en la app oficial de lucha libre.">
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
-      color: #fff;
-      padding: 24px 16px 120px;
-    }
-    .wrap { max-width: 440px; margin: 0 auto; }
-    .brand { text-align: center; margin-bottom: 20px; }
-    .brand h1 { margin: 0; font-size: 26px; letter-spacing: 2px; }
-    .card {
-      background: #131316;
-      border: 1px solid #2a2a30;
-      border-radius: 14px;
-      padding: 24px 20px;
-      text-align: center;
-    }
-    .ok-icon {
-      width: 64px; height: 64px; margin: 0 auto 12px;
-      border-radius: 50%;
-      background: rgba(76, 175, 80, 0.15);
-      color: #4caf50;
-      font-size: 36px; line-height: 64px;
-    }
-    h2 { margin: 0 0 8px; font-size: 28px; letter-spacing: 1px; font-weight: 800; }
-    p { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 14px; }
-    .event-title { margin-top: 20px; font-size: 20px; font-weight: 700; color: #fff; }
-    .event-meta { margin-top: 6px; font-size: 12px; color: #ffffff66; }
-    .ticket-card {
-      margin-top: 18px; padding: 16px; border-radius: 12px;
-      background: #fff; color: #0f0f12;
-    }
-    .ticket-card__label { margin: 0; font-size: 11px; letter-spacing: 1px; color: #666; }
-    .ticket-card__tier { margin: 4px 0 12px; font-size: 18px; font-weight: 800; color: #e50914; }
-    .ticket-card__qr,
-    .ticket-card__qr-wrap img {
-      display: block;
-      margin: 0 auto;
-      width: 220px;
-      height: 220px;
-    }
-    .ticket-card__qr-wrap {
-      min-height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .ticket-card__hint { margin: 10px 0 0; font-size: 12px; color: #666; }
-    .upsell {
-      margin-top: 24px; padding: 18px; text-align: left;
-      background: #1a1a1f; border-radius: 12px; border: 1px solid #2a2a30;
-    }
-    .upsell h3 { margin: 0 0 12px; font-size: 16px; color: #fff; }
-    .upsell li { margin: 0 0 8px; font-size: 13px; color: #ffffff99; line-height: 1.45; }
-    .spinner {
-      width: 40px; height: 40px; margin: 0 auto 16px;
-      border: 3px solid #ffffff22;
-      border-top-color: #e50914;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .sticky {
-      position: fixed; left: 0; right: 0; bottom: 0;
-      padding: 16px 20px 28px;
-      background: linear-gradient(180deg, transparent 0%, #0f0f12 35%);
-    }
-    .sticky-inner { max-width: 440px; margin: 0 auto; }
-    .btn {
-      display: block; width: 100%;
-      padding: 14px 20px; margin-top: 10px;
-      background: #e50914; color: #fff; text-decoration: none;
-      border: none; border-radius: 10px;
-      font-weight: 700; font-size: 15px; letter-spacing: 0.5px;
-      cursor: pointer; text-align: center;
-    }
-    .btn:first-child { margin-top: 0; }
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid #ffffff33;
-      color: #ffffffb3;
-      font-size: 13px;
-    }
-    .btn-link {
-      background: transparent; border: none; color: #ffffff66;
-      font-size: 13px; font-weight: 600; text-decoration: underline;
-      cursor: pointer; width: 100%; padding: 12px;
-    }
-    .signup-panel {
-      margin-top: 20px; padding: 18px; text-align: left;
-      background: #1a1a1f; border-radius: 12px; border: 1px solid #2a2a30;
-    }
-    .signup-panel h3 { margin: 0 0 8px; font-size: 18px; color: #fff; }
-    .signup-panel label { display: block; margin: 12px 0 4px; font-size: 11px; color: #ffffff66; letter-spacing: 0.8px; }
-    .signup-panel input {
-      width: 100%; padding: 12px 14px;
-      border-radius: 8px; border: 1px solid #2a2a30;
-      background: #0f0f12; color: #fff; font-size: 14px;
-    }
-    .signup-panel input[readonly] { opacity: 0.7; }
-    .error-box {
-      margin-top: 12px; padding: 10px 12px;
-      border-radius: 8px; background: rgba(229, 9, 20, 0.12);
-      border: 1px solid rgba(229, 9, 20, 0.4);
-      color: #ff8a8a; font-size: 13px;
-    }
-    .success-box {
-      margin-top: 12px; padding: 10px 12px;
-      border-radius: 8px; background: rgba(76, 175, 80, 0.12);
-      border: 1px solid rgba(76, 175, 80, 0.4);
-      color: #a5d6a7; font-size: 13px;
-    }
-    .hint-desktop {
-      margin: 14px 0 0;
-      font-size: 12px;
-      line-height: 1.5;
-      color: #ffffff55;
-      text-align: center;
-    }
-    .email-sent {
-      margin: 16px 0 0;
-      padding: 14px 16px;
-      background: #1a1a1f;
-      border-radius: 10px;
-      border: 1px solid #2a2a30;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #ffffffb3;
-      text-align: center;
-    }
+  <link rel="stylesheet" href="/shared/owg-postcompra.css">
 </head>
-<body data-owg-boletos-build="2026-07-06-v8">
+<body data-owg-boletos-build="2026-07-06-v9">
   <div class="wrap">
     <div class="brand"><h1>OWG</h1></div>
 
     <div id="view-loading" class="card">
       <div class="spinner"></div>
       <h2>CARGANDO TUS BOLETOS</h2>
-      <p>Un momento…</p>
+      <p class="success-subtitle">Un momento…</p>
     </div>
 
     <div id="view-success" class="card" hidden>
       <div class="ok-icon">✓</div>
-      <h2 id="page-headline">¡LISTO!</h2>
-      <p id="subtitle">Tus boletos están aquí.</p>
+      <h2>¡Listo!</h2>
+      <p class="success-subtitle">Tu boleto también está en el correo.</p>
       <p class="event-title" id="event-title"></p>
       <p class="event-meta" id="event-meta"></p>
       <div id="tickets"></div>
-      <div class="upsell" id="upsell">
-        <p id="upsell-text" style="margin:0;"></p>
+
+      <div class="conversion-card">
+        <h3>🎭 Vive la Lucha Libre al 100% con la App OWG</h3>
+        <ul class="benefits">
+          <li>
+            <span class="benefit-icon" aria-hidden="true">🔒</span>
+            <div class="benefit-text">
+              <strong>Acceso Seguro</strong>
+              <p>Tu boleto se sincroniza al instante. Olvídate de buscar en el correo.</p>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-icon" aria-hidden="true">👆</span>
+            <div class="benefit-text">
+              <strong>Sigue a tus Ídolos</strong>
+              <p>Recibe alertas en tiempo real cuando tus luchadores favoritos tengan función.</p>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-icon" aria-hidden="true">🏟️</span>
+            <div class="benefit-text">
+              <strong>Arenas Locales</strong>
+              <p>Entérate antes que nadie de las carteleras de tu ciudad y empresas independientes.</p>
+            </div>
+          </li>
+        </ul>
+        <p class="linked-email">Tu cuenta ya está vinculada a:<br><strong id="recovery-email">—</strong></p>
+        <p class="activation-hint">Para activar estos beneficios, solo descarga la app y regístrate con este mismo correo.</p>
       </div>
-      <div id="actions-desktop" hidden>
-        <p id="email-sent-note" class="email-sent" hidden></p>
-        <a id="btn-ir-correo" class="btn" href="#" target="_blank" rel="noopener noreferrer" hidden>REVISAR MI CORREO</a>
-        <p id="desktop-hint" class="hint-desktop" hidden></p>
-      </div>
-      <div id="signup-panel" class="signup-panel" hidden>
-        <h3>CREA TU CREDENCIAL</h3>
-        <p id="signup-intro" style="font-size:13px;color:#ffffff80;">Tus boletos se guardarán en esta cuenta.</p>
-        <p id="mobile-download-row" hidden style="margin:0 0 12px;font-size:13px;">
-          <a id="mobile-download-link" href="#" style="color:#e50914;font-weight:700;">Descargar la app OWG</a>
-          para llevar tus boletos en el celular.
-        </p>
-        <label for="reg-email">CORREO</label>
-        <input id="reg-email" type="email" readonly>
-        <label for="reg-nombre">APODO EN EL RING</label>
-        <input id="reg-nombre" type="text" autocomplete="name" placeholder="Tu apodo">
-        <label for="reg-pass">LLAVE SECRETA</label>
-        <input id="reg-pass" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
-        <div id="signup-error" class="error-box" hidden></div>
-        <div id="signup-success" class="success-box" hidden></div>
-        <button type="button" class="btn" id="btn-registrar" style="margin-top:16px;">GUARDAR BOLETOS</button>
+
+      <div class="store-buttons">
+        <a id="btn-app-store" class="store-btn" href="#" target="_blank" rel="noopener noreferrer">Descargar en App Store</a>
+        <a id="btn-play-store" class="store-btn store-btn--play" href="#" target="_blank" rel="noopener noreferrer">Descargar en Play Store</a>
       </div>
     </div>
 
     <div id="view-pending" class="card" hidden>
       <h2>BOLETOS EN CAMINO</h2>
-      <p>Tu pago puede estar confirmándose. Revisa tu correo en unos minutos o abre la app OWG.</p>
+      <p class="success-subtitle">
+        Tu pago puede estar confirmándose. Revisa tu correo en unos minutos — ahí estarán tus boletos con QR.
+      </p>
     </div>
   </div>
 
-  <div class="sticky" id="sticky-bar" hidden>
-    <div class="sticky-inner" id="actions-mobile" hidden>
-      <button type="button" class="btn" id="btn-crear-cuenta">GUARDAR BOLETO Y CREAR CUENTA</button>
-      <button type="button" class="btn btn-secondary" id="btn-abrir-app">DESCARGAR O ABRIR LA APP</button>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/owg-app-config.js"></script>
-  <script src="/shared/owg-device-flow.js"></script>
+  <script src="/shared/owg-postcompra.js"></script>
   <script src="/boletos/boletos.js"></script>
 </body>
 </html>

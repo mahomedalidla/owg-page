@@ -5,292 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Compra confirmada — OWG</title>
   <meta name="robots" content="noindex">
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
-      color: #fff;
-      padding: 24px 16px 40px;
-    }
-    .wrap { max-width: 440px; margin: 0 auto; }
-    .brand { text-align: center; margin-bottom: 20px; }
-    .brand h1 { margin: 0; font-size: 26px; letter-spacing: 2px; }
-    .card {
-      background: #131316;
-      border: 1px solid #2a2a30;
-      border-radius: 14px;
-      padding: 24px 20px;
-      text-align: center;
-    }
-    .ok-icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 12px;
-      border-radius: 50%;
-      background: rgba(76, 175, 80, 0.15);
-      color: #4caf50;
-      font-size: 36px;
-      line-height: 64px;
-    }
-    h2 {
-      margin: 0 0 8px;
-      font-size: 28px;
-      letter-spacing: 1px;
-      font-weight: 800;
-    }
-    p { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 14px; }
-    .event-title {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 0.5px;
-    }
-    .event-meta {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #ffffff66;
-    }
-    .ticket-card {
-      margin-top: 18px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #fff;
-      color: #0f0f12;
-    }
-    .ticket-card__label {
-      margin: 0;
-      font-size: 11px;
-      letter-spacing: 1px;
-      color: #666;
-    }
-    .ticket-card__tier {
-      margin: 4px 0 12px;
-      font-size: 18px;
-      font-weight: 800;
-      color: #e50914;
-      letter-spacing: 0.5px;
-    }
-    .ticket-card__qr,
-    .ticket-card__qr-wrap img {
-      display: block;
-      margin: 0 auto;
-      width: 220px;
-      height: 220px;
-    }
-    .ticket-card__qr-wrap {
-      min-height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .ticket-card__hint {
-      margin: 10px 0 0;
-      font-size: 12px;
-      color: #666;
-    }
-    .btn {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 14px 22px;
-      background: #e50914;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      font-size: 14px;
-    }
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid #ffffff33;
-    }
-    .actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      margin-top: 20px;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      margin: 0 auto 16px;
-      border: 3px solid #ffffff22;
-      border-top-color: #e50914;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    .btn-link {
-      background: transparent;
-      border: none;
-      color: #ffffff80;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: underline;
-      cursor: pointer;
-      padding: 8px;
-    }
-    .upsell {
-      margin-top: 20px;
-      padding: 16px;
-      text-align: left;
-      background: #1a1a1f;
-      border-radius: 12px;
-      border: 1px solid #2a2a30;
-      font-size: 13px;
-      color: #ffffff99;
-      line-height: 1.5;
-    }
-    .signup-panel {
-      margin-top: 20px;
-      padding: 18px;
-      text-align: left;
-      background: #1a1a1f;
-      border-radius: 12px;
-      border: 1px solid #2a2a30;
-    }
-    .signup-panel h3 { margin: 0 0 8px; font-size: 18px; color: #fff; }
-    .signup-panel label {
-      display: block;
-      margin: 12px 0 4px;
-      font-size: 11px;
-      color: #ffffff66;
-      letter-spacing: 0.8px;
-    }
-    .signup-panel input {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 8px;
-      border: 1px solid #2a2a30;
-      background: #0f0f12;
-      color: #fff;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-    .signup-panel input[readonly] { opacity: 0.75; }
-    .error-box {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: rgba(229, 9, 20, 0.12);
-      border: 1px solid rgba(229, 9, 20, 0.4);
-      color: #ff8a8a;
-      font-size: 13px;
-    }
-    .success-box {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      background: rgba(76, 175, 80, 0.12);
-      border: 1px solid rgba(76, 175, 80, 0.4);
-      color: #a5d6a7;
-      font-size: 13px;
-    }
-    .btn-block {
-      display: block;
-      width: 100%;
-      text-align: center;
-      border: none;
-      cursor: pointer;
-    }
-    [hidden] { display: none !important; }
-    .hint-desktop {
-      margin: 14px 0 0;
-      font-size: 12px;
-      line-height: 1.5;
-      color: #ffffff55;
-      text-align: center;
-    }
-    .email-sent {
-      margin: 16px 0 0;
-      padding: 14px 16px;
-      background: #1a1a1f;
-      border-radius: 10px;
-      border: 1px solid #2a2a30;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #ffffffb3;
-      text-align: center;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
+  <link rel="stylesheet" href="/shared/owg-postcompra.css">
 </head>
-<body data-owg-callback-build="2026-07-06-v8">
+<body data-owg-callback-build="2026-07-06-v9">
   <div class="wrap">
     <div class="brand"><h1>OWG</h1></div>
 
     <div id="view-loading" class="card">
       <div class="spinner"></div>
       <h2>ASEGURANDO TUS LUGARES</h2>
-      <p>Confirmando el pago con Stripe…</p>
+      <p class="success-subtitle">Confirmando el pago con Stripe…</p>
     </div>
 
     <div id="view-success" class="card" hidden>
       <div class="ok-icon">✓</div>
-      <h2 id="page-headline">¡PAGO EXITOSO!</h2>
-      <p id="email-note">Hemos enviado una copia a tu correo.</p>
+      <h2>¡Listo!</h2>
+      <p class="success-subtitle">Tu boleto también está en el correo.</p>
       <p class="event-title" id="event-title"></p>
       <p class="event-meta" id="event-meta"></p>
       <div id="tickets"></div>
-      <div class="upsell" id="upsell-block">
-        <p id="upsell-text" style="margin:0;"></p>
+
+      <div class="conversion-card">
+        <h3>🎭 Vive la Lucha Libre al 100% con la App OWG</h3>
+        <ul class="benefits">
+          <li>
+            <span class="benefit-icon" aria-hidden="true">🔒</span>
+            <div class="benefit-text">
+              <strong>Acceso Seguro</strong>
+              <p>Tu boleto se sincroniza al instante. Olvídate de buscar en el correo.</p>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-icon" aria-hidden="true">👆</span>
+            <div class="benefit-text">
+              <strong>Sigue a tus Ídolos</strong>
+              <p>Recibe alertas en tiempo real cuando tus luchadores favoritos tengan función.</p>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-icon" aria-hidden="true">🏟️</span>
+            <div class="benefit-text">
+              <strong>Arenas Locales</strong>
+              <p>Entérate antes que nadie de las carteleras de tu ciudad y empresas independientes.</p>
+            </div>
+          </li>
+        </ul>
+        <p class="linked-email">Tu cuenta ya está vinculada a:<br><strong id="recovery-email">—</strong></p>
+        <p class="activation-hint">Para activar estos beneficios, solo descarga la app y regístrate con este mismo correo.</p>
       </div>
-      <div id="actions-desktop" hidden>
-        <p id="email-sent-note" class="email-sent" hidden></p>
-        <a id="btn-ir-correo" class="btn btn-block" href="#" target="_blank" rel="noopener noreferrer" hidden>REVISAR MI CORREO</a>
-        <p id="desktop-hint" class="hint-desktop" hidden></p>
-      </div>
-      <div class="actions" id="actions-mobile" hidden>
-        <button type="button" id="btn-crear-cuenta" class="btn btn-block">GUARDAR BOLETO Y CREAR CUENTA</button>
-        <a id="open-app" class="btn btn-secondary" href="#">DESCARGAR O ABRIR LA APP</a>
-      </div>
-      <div id="signup-panel" class="signup-panel" hidden>
-        <h3>CREA TU CREDENCIAL</h3>
-        <p id="signup-intro" style="font-size:13px;color:#ffffff80;margin:0 0 4px;">Tus boletos se guardarán en esta cuenta OWG.</p>
-        <p id="mobile-download-row" hidden style="margin:0 0 12px;font-size:13px;">
-          <a id="mobile-download-link" href="#" style="color:#e50914;font-weight:700;">Descargar la app OWG</a>
-        </p>
-        <label for="reg-email">CORREO</label>
-        <input id="reg-email" type="email" readonly>
-        <label for="reg-nombre">APODO EN EL RING</label>
-        <input id="reg-nombre" type="text" autocomplete="name" placeholder="Tu apodo">
-        <label for="reg-pass">LLAVE SECRETA</label>
-        <input id="reg-pass" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
-        <div id="signup-error" class="error-box" hidden></div>
-        <div id="signup-success" class="success-box" hidden></div>
-        <button type="button" class="btn btn-block" id="btn-registrar" style="margin-top:16px;">GUARDAR BOLETOS</button>
+
+      <div class="store-buttons">
+        <a id="btn-app-store" class="store-btn" href="#" target="_blank" rel="noopener noreferrer">Descargar en App Store</a>
+        <a id="btn-play-store" class="store-btn store-btn--play" href="#" target="_blank" rel="noopener noreferrer">Descargar en Play Store</a>
       </div>
     </div>
 
     <div id="view-pending" class="card" hidden>
       <h2>PAGO EN PROCESO</h2>
-      <p>
+      <p class="success-subtitle">
         Tu pago se está confirmando. En unos minutos llegará el correo con tus boletos y QR.
         Si ya pagaste, revisa tu bandeja o la carpeta de spam.
       </p>
-      <div class="actions">
-        <a id="open-app-pending" class="btn" href="#">ABRIR EN LA APP</a>
-      </div>
     </div>
 
     <div id="view-cancelled" class="card" hidden>
       <h2>PAGO NO COMPLETADO</h2>
-      <p>Puedes volver al enlace del evento e intentar de nuevo.</p>
-      <div class="actions">
-        <a class="btn btn-secondary" href="https://owg-app.com">Ir a owg-app.com</a>
-      </div>
+      <p class="success-subtitle">Puedes volver al enlace del evento e intentar de nuevo.</p>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/owg-app-config.js"></script>
-  <script src="/shared/owg-device-flow.js"></script>
+  <script src="/shared/owg-postcompra.js"></script>
   <script>
-    /* owg-callback-build: 2026-07-06-v8 */
+    /* owg-callback-build: 2026-07-06-v9 */
     (function () {
       'use strict';
 
@@ -314,35 +101,7 @@
       var elSuccess = document.getElementById('view-success');
       var elPending = document.getElementById('view-pending');
       var elCancelled = document.getElementById('view-cancelled');
-      var elTickets = document.getElementById('tickets');
-      var elEventTitle = document.getElementById('event-title');
-      var elEventMeta = document.getElementById('event-meta');
-      var elEmailNote = document.getElementById('email-note');
-      var elOpenApp = document.getElementById('open-app');
-      var elBtnCrear = document.getElementById('btn-crear-cuenta');
-      var elSignupPanel = document.getElementById('signup-panel');
-      var elRegEmail = document.getElementById('reg-email');
-      var elRegNombre = document.getElementById('reg-nombre');
-      var elRegPass = document.getElementById('reg-pass');
-      var elSignupError = document.getElementById('signup-error');
-      var elSignupSuccess = document.getElementById('signup-success');
-      var recoveryEmail = '';
-      var supabase = null;
-
-      var flow = window.OwgDeviceFlow;
-
-      function isMobileWeb() {
-        return flow ? flow.isMobile() : /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-      }
-
-      function storeUrl() {
-        return flow ? flow.storeUrl() : 'https://play.google.com/store/apps/details?id=com.owg.app';
-      }
-
-      var pending = document.getElementById('open-app-pending');
-      if (pending && orderId) {
-        pending.href = '/boletos/index.html?order=' + encodeURIComponent(orderId);
-      }
+      var pc = window.OwgPostCompra;
 
       function hideAll() {
         [elLoading, elSuccess, elPending, elCancelled].forEach(function (el) {
@@ -384,22 +143,6 @@
         throw new Error('No se pudo conectar con el servidor.');
       }
 
-      function formatFecha(iso) {
-        if (!iso) return '';
-        try {
-          return new Date(iso).toLocaleString('es-MX', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          });
-        } catch (_) {
-          return String(iso);
-        }
-      }
-
       async function confirmarPagoWeb(cfg) {
         var fnUrl = cfg.url + '/functions/v1/confirmar-pago-boleto-web';
         var res = await fetch(fnUrl, {
@@ -417,198 +160,6 @@
         }
         return body;
       }
-
-      function renderTickets(data) {
-        if (!elTickets) return;
-        elTickets.innerHTML = '';
-        var tickets = Array.isArray(data.tickets) ? data.tickets : [];
-        if (tickets.length === 0) return;
-
-        tickets.forEach(function (ticket, index) {
-          var card = document.createElement('div');
-          card.className = 'ticket-card';
-
-          var label = document.createElement('p');
-          label.className = 'ticket-card__label';
-          label.textContent = 'BOLETO ' + (index + 1);
-
-          var tier = document.createElement('p');
-          tier.className = 'ticket-card__tier';
-          tier.textContent = ticket.tier_name || 'General';
-
-          var wrap = document.createElement('div');
-          wrap.className = 'ticket-card__qr-wrap';
-
-          if (ticket.qr_image) {
-            var img = document.createElement('img');
-            img.src = ticket.qr_image;
-            img.alt = 'Código QR del boleto';
-            img.className = 'ticket-card__qr';
-            img.width = 220;
-            img.height = 220;
-            wrap.appendChild(img);
-          } else {
-            var fallback = document.createElement('p');
-            fallback.style.cssText = 'margin:0;font-size:12px;color:#666;text-align:center;';
-            fallback.textContent = 'Actualiza la función confirmar-pago-boleto-web en Supabase y recarga.';
-            wrap.appendChild(fallback);
-          }
-
-          var hint = document.createElement('p');
-          hint.className = 'ticket-card__hint';
-          hint.textContent = 'Presenta este código en la entrada.';
-
-          card.appendChild(label);
-          card.appendChild(tier);
-          card.appendChild(wrap);
-          card.appendChild(hint);
-          elTickets.appendChild(card);
-        });
-      }
-
-      function boletosLandingUrl(accion) {
-        var q = new URLSearchParams();
-        if (orderId) q.set('order', orderId);
-        if (accion) q.set('accion', accion);
-        if (recoveryEmail) q.set('email', recoveryEmail);
-        return '/boletos/index.html?' + q.toString();
-      }
-
-      function deepLink(accion) {
-        var q = new URLSearchParams();
-        if (orderId) q.set('order', orderId);
-        if (accion) q.set('accion', accion);
-        if (recoveryEmail) q.set('email', recoveryEmail);
-        var suffix = q.toString();
-        return 'owg://boletos' + (suffix ? '?' + suffix : '');
-      }
-
-      async function initSupabase(cfg) {
-        if (!window.supabase || !window.supabase.createClient) return;
-        supabase = window.supabase.createClient(cfg.url, cfg.anonKey);
-      }
-
-      async function ensureSession() {
-        var existing = await supabase.auth.getSession();
-        if (existing.data.session) return existing.data.session;
-        var anon = await supabase.auth.signInAnonymously();
-        if (anon.error || !anon.data.session) throw new Error('No se pudo iniciar sesión.');
-        return anon.data.session;
-      }
-
-      function showSignupPanel() {
-        if (!elSignupPanel || !isMobileWeb()) return;
-        if (elRegEmail && recoveryEmail) elRegEmail.value = recoveryEmail;
-        elSignupPanel.hidden = false;
-        if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail, signupOpen: true });
-        var dl = document.getElementById('mobile-download-link');
-        if (dl) dl.href = storeUrl();
-        elSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      function onCrearCuenta() {
-        if (!isMobileWeb()) return;
-        var link = deepLink('crear-cuenta');
-        if (flow) {
-          flow.tryAppThen(link, 1800, showSignupPanel);
-        } else {
-          window.location.href = link;
-          setTimeout(showSignupPanel, 1800);
-        }
-      }
-
-      function onAbrirApp() {
-        if (!isMobileWeb() || !elOpenApp) return;
-        var link = deepLink('');
-        if (flow) {
-          flow.tryAppThen(link, 1500, function () {
-            window.location.href = storeUrl();
-          });
-        }
-      }
-
-      function showSignupError(msg) {
-        if (!elSignupError) return;
-        elSignupError.textContent = msg;
-        elSignupError.hidden = !msg;
-        if (elSignupSuccess) elSignupSuccess.hidden = true;
-      }
-
-      function showSignupOk(msg) {
-        if (!elSignupSuccess) return;
-        elSignupSuccess.textContent = msg;
-        elSignupSuccess.hidden = !msg;
-        if (elSignupError) elSignupError.hidden = true;
-      }
-
-      async function registrarCuenta() {
-        var email = (elRegEmail && elRegEmail.value || recoveryEmail || '').trim().toLowerCase();
-        var nombre = (elRegNombre && elRegNombre.value || '').trim();
-        var pass = (elRegPass && elRegPass.value || '').trim();
-        if (!email || email.indexOf('@') < 1) {
-          showSignupError('Indica un correo válido.');
-          return;
-        }
-        if (!nombre) {
-          showSignupError('Indica tu apodo.');
-          return;
-        }
-        if (pass.length < 6) {
-          showSignupError('La llave secreta debe tener al menos 6 caracteres.');
-          return;
-        }
-        showSignupError('');
-        var btn = document.getElementById('btn-registrar');
-        if (btn) btn.disabled = true;
-        try {
-          await ensureSession();
-          var user = (await supabase.auth.getUser()).data.user;
-          var response;
-          if (user && user.is_anonymous) {
-            response = await supabase.auth.updateUser({
-              email: email,
-              password: pass,
-              data: { name: nombre, recovery_email: email },
-            });
-            if (response.error) throw response.error;
-            try {
-              await supabase.rpc('completar_vinculacion_cuenta', { p_name: nombre });
-            } catch (_) {}
-          } else {
-            response = await supabase.auth.signUp({
-              email: email,
-              password: pass,
-              options: { data: { name: nombre, recovery_email: email } },
-            });
-            if (response.error) throw response.error;
-          }
-          await supabase.rpc('reclamar_boletos_por_email');
-          var okMsg = flow ? flow.textos().signupOk : '¡Cuenta lista! Tus boletos están guardados.';
-          showSignupOk(okMsg);
-        } catch (e) {
-          var msg = e && e.message ? e.message : 'No se pudo crear la cuenta.';
-          showSignupError(msg);
-        } finally {
-          if (btn) btn.disabled = false;
-        }
-      }
-
-      function aplicarUiPostCompra() {
-        if (flow) flow.aplicarUi(document, { recoveryEmail: recoveryEmail });
-        var dl = document.getElementById('mobile-download-link');
-        if (dl) dl.href = storeUrl();
-        if (elOpenApp && isMobileWeb()) {
-          elOpenApp.addEventListener('click', function (e) {
-            e.preventDefault();
-            onAbrirApp();
-          });
-        }
-      }
-
-      if (elBtnCrear) elBtnCrear.addEventListener('click', onCrearCuenta);
-
-      var btnReg = document.getElementById('btn-registrar');
-      if (btnReg) btnReg.addEventListener('click', registrarCuenta);
 
       async function pollConfirm(cfg, attempts) {
         var last = null;
@@ -631,7 +182,7 @@
 
       async function onSuccess() {
         show(elLoading);
-        aplicarUiPostCompra();
+        if (pc) pc.initStoreButtons(document);
 
         if (!orderId || !sessionId) {
           show(elPending);
@@ -640,28 +191,11 @@
 
         try {
           var cfg = await loadSupabaseConfig();
-          await initSupabase(cfg);
           var data = await pollConfirm(cfg, 6);
 
           if (data && data.tickets && data.tickets.length > 0) {
-            if (elEventTitle && data.event) {
-              elEventTitle.textContent = data.event.title || 'Tu evento';
-            }
-            if (elEventMeta && data.event) {
-              elEventMeta.textContent = [
-                formatFecha(data.event.event_date),
-                data.event.venue,
-                data.event.city,
-              ].filter(Boolean).join(' · ');
-            }
-            if (elEmailNote && !recoveryEmail) {
-              recoveryEmail = data.recovery_email || '';
-            } else if (data.recovery_email) {
-              recoveryEmail = data.recovery_email;
-            }
-            aplicarUiPostCompra();
+            if (pc) pc.showSuccess(document, data);
             show(elSuccess);
-            requestAnimationFrame(function () { renderTickets(data); });
             try { localStorage.removeItem(PENDING_KEY); } catch (_) {}
             return;
           }
@@ -673,7 +207,6 @@
         }
       }
 
-      aplicarUiPostCompra();
       if (status === 'cancelled' || status === 'failure') {
         show(elCancelled);
       } else if (status === 'success') {
