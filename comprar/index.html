@@ -210,6 +210,55 @@
       text-align: center;
     }
     .hint a { color: #e50914; }
+    .chooser-title {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      line-height: 1.25;
+    }
+    .chooser-sub {
+      margin: 0 0 18px;
+      color: #ffffff80;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .chooser-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-chooser {
+      display: block;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(90deg, #e50914, #8b0000);
+      box-shadow: 0 4px 16px #e5091444;
+    }
+    .btn-chooser--secondary {
+      background: transparent;
+      border: 1px solid #ffffff33;
+      box-shadow: none;
+      color: #fff;
+    }
+    .btn-chooser--ghost {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      color: #ffffff66;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px;
+    }
   </style>
 </head>
 <body>
@@ -219,53 +268,71 @@
       <p>Official Wrestling Group</p>
     </div>
 
-    <p id="status">Cargando evento…</p>
-
-    <div id="event-card" class="card" hidden>
-      <h2 id="event-title"></h2>
-      <p id="event-meta"></p>
-      <p id="event-promo"></p>
+    <div id="chooser" class="card" hidden>
+      <p class="chooser-title">¿Cómo quieres comprar?</p>
+      <p class="chooser-sub">
+        Si tienes la app OWG, ábrela. Si no, compra aquí en el navegador o descárgala.
+      </p>
+      <div class="chooser-actions">
+        <a id="chooser-app" class="btn-chooser" href="#">Abrir en la app</a>
+        <button type="button" id="chooser-web" class="btn-chooser btn-chooser--secondary">
+          Comprar en el navegador
+        </button>
+        <a id="chooser-store" class="btn-chooser btn-chooser--ghost" href="#" target="_blank" rel="noopener noreferrer">
+          No tengo la app — descargar
+        </a>
+      </div>
     </div>
 
-    <div class="card" id="tiers-card" hidden>
-      <p class="section-label">Zona de boleto</p>
-      <div id="tiers" class="tiers"></div>
-    </div>
+    <p id="status" hidden>Cargando evento…</p>
 
-    <form id="checkout-form" class="card" hidden>
-      <p class="section-label">Tu correo</p>
-      <label for="email">Para enviarte el QR</label>
-      <input
-        id="email"
-        type="email"
-        name="email"
-        autocomplete="email"
-        placeholder="tu@correo.com"
-        required
-      >
+    <div id="checkout-flow" hidden>
+      <div id="event-card" class="card" hidden>
+        <h2 id="event-title"></h2>
+        <p id="event-meta"></p>
+        <p id="event-promo"></p>
+      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="quantity">Cantidad</label>
-          <input id="quantity" type="number" min="1" max="10" value="1" required>
+      <div class="card" id="tiers-card" hidden>
+        <p class="section-label">Zona de boleto</p>
+        <div id="tiers" class="tiers"></div>
+      </div>
+
+      <form id="checkout-form" class="card" hidden>
+        <p class="section-label">Tu correo</p>
+        <label for="email">Para enviarte el QR</label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          autocomplete="email"
+          placeholder="tu@correo.com"
+          required
+        >
+
+        <div class="row">
+          <div class="field">
+            <label for="quantity">Cantidad</label>
+            <input id="quantity" type="number" min="1" max="10" value="1" required>
+          </div>
         </div>
-      </div>
 
-      <div class="total">
-        <span>Total</span>
-        <span id="total">$0.00</span>
-      </div>
+        <div class="total">
+          <span>Total</span>
+          <span id="total">$0.00</span>
+        </div>
 
-      <button type="submit" class="btn-pay" id="submit-btn" disabled>
-        PAGAR CON TARJETA
-      </button>
-      <p id="error" hidden></p>
-    </form>
+        <button type="submit" class="btn-pay" id="submit-btn" disabled>
+          PAGAR CON TARJETA
+        </button>
+        <p id="error" hidden></p>
+      </form>
 
-    <p class="hint">
-      Tras pagar recibirás un correo con tu QR para la entrada.
-      También puedes guardarlos en la <a href="/">app OWG</a>.
-    </p>
+      <p class="hint">
+        Tras pagar recibirás un correo con tu QR para la entrada.
+        También puedes guardarlos en la <a href="/">app OWG</a>.
+      </p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

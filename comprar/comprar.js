@@ -6,6 +6,8 @@
   var eventId = params.get('id') || (fromPath ? fromPath[1] : null);
 
   var elStatus = document.getElementById('status');
+  var elChooser = document.getElementById('chooser');
+  var elCheckoutFlow = document.getElementById('checkout-flow');
   var elEvent = document.getElementById('event-card');
   var elTiersCard = document.getElementById('tiers-card');
   var elTiers = document.getElementById('tiers');
@@ -15,6 +17,10 @@
   var elTotal = document.getElementById('total');
   var elSubmit = document.getElementById('submit-btn');
   var elError = document.getElementById('error');
+  var elChooserApp = document.getElementById('chooser-app');
+  var elChooserWeb = document.getElementById('chooser-web');
+  var elChooserStore = document.getElementById('chooser-store');
+  var WEB_PREF_KEY = 'owg_comprar_web_' + String(eventId || '');
 
   var supabase = null;
   var session = null;
@@ -308,11 +314,64 @@
     }
   }
 
-  async function init() {
-    if (!eventId || !/^\d+$/.test(String(eventId))) {
-      elStatus.textContent = 'Enlace inválido. Necesitas el ID del evento (?id=123).';
+  function preferWebCheckout() {
+    if (params.get('web') === '1') return true;
+    try {
+      return sessionStorage.getItem(WEB_PREF_KEY) === '1';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function markWebPreference() {
+    try {
+      sessionStorage.setItem(WEB_PREF_KEY, '1');
+    } catch (_) {}
+  }
+
+  function setupChooser() {
+    if (!elChooser || !elChooserApp || !elChooserWeb || !elChooserStore) {
+      startWebCheckout();
       return;
     }
+
+    var cfg = window.OWG_APP_CONFIG || {};
+    var playStore = cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app';
+    var appStore =
+      typeof cfg.appStoreUrl === 'function' ? cfg.appStoreUrl() : cfg.appStoreSearchUrl;
+    var isAndroid = /Android/i.test(navigator.userAgent);
+    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var storeUrl = isIOS ? appStore : playStore;
+    var deepLink = 'owg://evento/' + eventId;
+    var intentLink =
+      'intent://evento/' +
+      eventId +
+      '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
+      encodeURIComponent(storeUrl) +
+      ';end';
+
+    elChooserStore.href = storeUrl;
+    elChooserApp.href = isAndroid ? intentLink : deepLink;
+    elChooserApp.addEventListener('click', function (e) {
+      if (!isAndroid) return;
+      e.preventDefault();
+      window.location.href = intentLink;
+    });
+    elChooserWeb.addEventListener('click', function () {
+      markWebPreference();
+      startWebCheckout();
+    });
+
+    elChooser.hidden = false;
+    elStatus.hidden = true;
+    if (elCheckoutFlow) elCheckoutFlow.hidden = true;
+  }
+
+  async function startWebCheckout() {
+    if (elChooser) elChooser.hidden = true;
+    if (elCheckoutFlow) elCheckoutFlow.hidden = false;
+    elStatus.hidden = false;
+    elStatus.textContent = 'Cargando evento…';
 
     elQty.addEventListener('change', updateTotal);
     elQty.addEventListener('input', updateTotal);
@@ -322,8 +381,24 @@
       await ensureSupabase();
       await loadEvent();
     } catch (e) {
+      elStatus.hidden = false;
       elStatus.textContent = e.message || 'No se pudo cargar la compra.';
     }
+  }
+
+  async function init() {
+    if (!eventId || !/^\d+$/.test(String(eventId))) {
+      elStatus.hidden = false;
+      elStatus.textContent = 'Enlace inválido. Necesitas el ID del evento (?id=123).';
+      return;
+    }
+
+    if (preferWebCheckout()) {
+      await startWebCheckout();
+      return;
+    }
+
+    setupChooser();
   }
 
   if (document.readyState === 'loading') {
