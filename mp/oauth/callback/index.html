@@ -28,6 +28,12 @@
       text-align: center;
     }
     h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 2px; }
+    .owg-brand-logo {
+      display: block;
+      width: min(160px, 48vw);
+      height: auto;
+      margin: 0 auto 12px;
+    }
     .sub { margin: 0 0 20px; color: #ffffff66; font-size: 13px; }
     #status { margin: 0; color: #ffffffb3; line-height: 1.5; font-size: 15px; }
     .btn {
@@ -46,7 +52,7 @@
 </head>
 <body>
   <div class="card">
-    <h1>OWG</h1>
+    <img class="owg-brand-logo" src="/shared/logo-letras.svg" alt="OWG" width="160" height="74">
     <p class="sub">Mercado Pago</p>
     <p id="status">Toca el botón para volver a la app y terminar la conexión.</p>
     <a id="open-app" class="btn" href="#">Continuar en OWG</a>

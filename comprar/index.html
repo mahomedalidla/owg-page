@@ -7,43 +7,13 @@
   <meta name="description" content="Compra boletos para eventos de lucha libre con tarjeta. Sin descargar la app.">
   <meta property="og:title" content="Boletos — OWG">
   <meta property="og:description" content="Compra en línea y recibe tu QR por correo.">
+  <link rel="stylesheet" href="/shared/owg-tokens.css">
+  <link rel="stylesheet" href="/shared/owg-ui.css">
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #1c1315 0%, #0f0f12 55%);
-      color: #fff;
-      padding: 20px 16px 40px;
-    }
-    .wrap { max-width: 480px; margin: 0 auto; }
-    .brand {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .brand h1 {
-      margin: 0;
-      font-size: 28px;
-      letter-spacing: 3px;
-      font-weight: 800;
-    }
-    .brand p {
-      margin: 4px 0 0;
-      color: #ffffff55;
-      font-size: 12px;
-      letter-spacing: 1px;
-    }
-    .card {
-      background: #131316;
-      border: 1px solid #2a2a30;
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
+    body.owg-body { padding: 20px 16px 40px; }
     #status {
       text-align: center;
-      color: #ffffffb3;
+      color: var(--owg-text-secondary);
       line-height: 1.5;
       padding: 32px 8px;
     }
@@ -56,25 +26,17 @@
     }
     #event-meta, #event-promo {
       margin: 0;
-      color: #ffffff80;
+      color: var(--owg-text-secondary);
       font-size: 13px;
       line-height: 1.45;
     }
     #event-promo {
       margin-top: 6px;
-      color: #e50914;
+      color: var(--owg-brand-red);
       font-weight: 600;
       text-transform: uppercase;
       font-size: 11px;
       letter-spacing: 0.8px;
-    }
-    .section-label {
-      margin: 0 0 10px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      color: #ffffff55;
-      text-transform: uppercase;
     }
     .tiers {
       display: flex;
@@ -89,10 +51,10 @@
       width: 100%;
       text-align: left;
       padding: 14px 16px;
-      border-radius: 12px;
-      border: 1px solid #2a2a30;
-      background: #1a1a20;
-      color: #fff;
+      border-radius: var(--owg-radius-cta);
+      border: 1px solid var(--owg-border);
+      background: var(--owg-surface);
+      color: var(--owg-text);
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
     }
@@ -100,8 +62,8 @@
       border-color: #e5091466;
     }
     .tier--active {
-      border-color: #e50914;
-      background: linear-gradient(135deg, #231229 0%, #131316 100%);
+      border-color: var(--owg-brand-red);
+      background: linear-gradient(135deg, #231229 0%, var(--owg-scaffold) 100%);
     }
     .tier--sold {
       opacity: 0.45;
@@ -115,14 +77,14 @@
     .tier__price {
       font-weight: 800;
       font-size: 16px;
-      color: #e50914;
+      color: var(--owg-brand-red);
       grid-column: 2;
       grid-row: 1;
     }
     .tier__stock {
       grid-column: 1 / -1;
       font-size: 11px;
-      color: #ffffff55;
+      color: var(--owg-text-muted);
     }
     label {
       display: block;
@@ -130,23 +92,23 @@
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.8px;
-      color: #ffffff55;
+      color: var(--owg-text-muted);
       text-transform: uppercase;
     }
     input[type="email"],
     input[type="number"] {
       width: 100%;
       padding: 14px 12px;
-      border-radius: 10px;
-      border: 1px solid #2a2a30;
-      background: #1a1a20;
-      color: #fff;
+      border-radius: var(--owg-radius-input);
+      border: 1px solid var(--owg-border);
+      background: var(--owg-surface);
+      color: var(--owg-text);
       font-size: 15px;
       margin-bottom: 14px;
     }
     input:focus {
       outline: none;
-      border-color: #e50914;
+      border-color: var(--owg-brand-red);
     }
     .row {
       display: flex;
@@ -160,11 +122,11 @@
       align-items: center;
       margin: 8px 0 16px;
       padding-top: 12px;
-      border-top: 1px solid #2a2a30;
+      border-top: 1px solid var(--owg-border);
     }
     .total span:first-child {
       font-size: 12px;
-      color: #ffffff55;
+      color: var(--owg-text-muted);
       letter-spacing: 0.8px;
       text-transform: uppercase;
       font-weight: 700;
@@ -172,44 +134,18 @@
     .total span:last-child {
       font-size: 22px;
       font-weight: 800;
-      color: #e50914;
-    }
-    .btn-pay {
-      width: 100%;
-      padding: 16px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(90deg, #e50914, #8b0000);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      cursor: pointer;
-      box-shadow: 0 4px 16px #e5091444;
-    }
-    .btn-pay:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      box-shadow: none;
+      color: var(--owg-brand-red);
     }
     #error {
       margin-top: 12px;
       padding: 12px;
-      border-radius: 10px;
+      border-radius: var(--owg-radius-input);
       background: #2a1214;
       border: 1px solid #e5091444;
       color: #ffb4b4;
       font-size: 13px;
       line-height: 1.4;
     }
-    .hint {
-      margin-top: 16px;
-      font-size: 12px;
-      color: #ffffff55;
-      line-height: 1.5;
-      text-align: center;
-    }
-    .hint a { color: #e50914; }
     .chooser-title {
       margin: 0 0 8px;
       font-size: 20px;
@@ -219,7 +155,7 @@
     }
     .chooser-sub {
       margin: 0 0 18px;
-      color: #ffffff80;
+      color: var(--owg-text-secondary);
       font-size: 14px;
       line-height: 1.45;
     }
@@ -228,57 +164,27 @@
       flex-direction: column;
       gap: 10px;
     }
-    .btn-chooser {
-      display: block;
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: none;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      color: #fff;
-      background: linear-gradient(90deg, #e50914, #8b0000);
-      box-shadow: 0 4px 16px #e5091444;
-    }
-    .btn-chooser--secondary {
-      background: transparent;
-      border: 1px solid #ffffff33;
-      box-shadow: none;
-      color: #fff;
-    }
-    .btn-chooser--ghost {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      color: #ffffff66;
-      font-weight: 600;
-      font-size: 13px;
-      padding: 8px;
-    }
+    [hidden] { display: none !important; }
   </style>
 </head>
-<body>
-  <div class="wrap">
-    <div class="brand">
-      <h1>OWG</h1>
+<body class="owg-body">
+  <div class="owg-wrap">
+    <div class="owg-brand">
+      <img class="owg-brand-logo" src="/shared/logo-letras.svg" alt="OWG" width="168" height="78">
       <p>Official Wrestling Group</p>
     </div>
 
-    <div id="chooser" class="card" hidden>
+    <div id="chooser" class="owg-card" hidden>
       <p class="chooser-title">¿Cómo quieres comprar?</p>
       <p class="chooser-sub">
         Si tienes la app OWG, ábrela. Si no, compra aquí en el navegador o descárgala.
       </p>
       <div class="chooser-actions">
-        <a id="chooser-app" class="btn-chooser" href="#">Abrir en la app</a>
-        <button type="button" id="chooser-web" class="btn-chooser btn-chooser--secondary">
+        <a id="chooser-app" class="owg-btn" href="#">Abrir en la app</a>
+        <button type="button" id="chooser-web" class="owg-btn owg-btn--secondary">
           Comprar en el navegador
         </button>
-        <a id="chooser-store" class="btn-chooser btn-chooser--ghost" href="#" target="_blank" rel="noopener noreferrer">
+        <a id="chooser-store" class="owg-btn owg-btn--ghost" href="#" target="_blank" rel="noopener noreferrer">
           No tengo la app — descargar
         </a>
       </div>
@@ -287,19 +193,19 @@
     <p id="status" hidden>Cargando evento…</p>
 
     <div id="checkout-flow" hidden>
-      <div id="event-card" class="card" hidden>
+      <div id="event-card" class="owg-card" hidden>
         <h2 id="event-title"></h2>
         <p id="event-meta"></p>
         <p id="event-promo"></p>
       </div>
 
-      <div class="card" id="tiers-card" hidden>
-        <p class="section-label">Zona de boleto</p>
+      <div class="owg-card" id="tiers-card" hidden>
+        <p class="owg-section-label">Zona de boleto</p>
         <div id="tiers" class="tiers"></div>
       </div>
 
-      <form id="checkout-form" class="card" hidden>
-        <p class="section-label">Tu correo</p>
+      <form id="checkout-form" class="owg-card" hidden>
+        <p class="owg-section-label">Tu correo</p>
         <label for="email">Para enviarte el QR</label>
         <input
           id="email"
@@ -322,13 +228,13 @@
           <span id="total">$0.00</span>
         </div>
 
-        <button type="submit" class="btn-pay" id="submit-btn" disabled>
+        <button type="submit" class="owg-btn" id="submit-btn" disabled>
           PAGAR CON TARJETA
         </button>
         <p id="error" hidden></p>
       </form>
 
-      <p class="hint">
+      <p class="owg-hint">
         Tras pagar recibirás un correo con tu QR para la entrada.
         También puedes guardarlos en la <a href="/">app OWG</a>.
       </p>
@@ -337,7 +243,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/owg-app-config.js"></script>
-  <!-- opcional en local: owg-supabase-config.js; en Vercel usa /api/supabase-config -->
   <script src="/comprar/comprar.js"></script>
 </body>
 </html>

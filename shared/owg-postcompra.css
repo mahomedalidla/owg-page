@@ -10,6 +10,13 @@ body {
 }
 .wrap { max-width: 440px; margin: 0 auto; }
 .brand { text-align: center; margin-bottom: 20px; }
+.brand .owg-brand-logo,
+.owg-brand .owg-brand-logo {
+  display: block;
+  width: min(168px, 52vw);
+  height: auto;
+  margin: 0 auto;
+}
 .brand h1 { margin: 0; font-size: 26px; letter-spacing: 2px; }
 .card {
   background: var(--owg-scaffold, #131316);
