@@ -1,0 +1,28 @@
+/**
+ * Design tokens OWG (web hosting).
+ * Radios: chip 8 · input 10 · CTA/card 12 · sheet 16.
+ */
+:root {
+  --owg-brand-red: #e50914;
+  --owg-brand-red-dark: #8b0000;
+  --owg-brand-gold: #ffd700;
+  --owg-success: #4caf50;
+  --owg-scaffold: #131316;
+  --owg-scaffold-deep: #0f0f12;
+  --owg-gradient-top: #1c1315;
+  --owg-surface: #1a1a1f;
+  --owg-surface-elevated: #1e1e22;
+  --owg-border: #2a2a30;
+  --owg-text: #ffffff;
+  --owg-text-secondary: rgba(255, 255, 255, 0.7);
+  --owg-text-tertiary: rgba(255, 255, 255, 0.38);
+  --owg-text-muted: rgba(255, 255, 255, 0.33);
+
+  --owg-radius-chip: 8px;
+  --owg-radius-input: 10px;
+  --owg-radius-cta: 12px;
+  --owg-radius-card: 12px;
+  --owg-radius-sheet: 16px;
+
+  --owg-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+}

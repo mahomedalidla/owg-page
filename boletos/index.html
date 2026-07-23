@@ -7,19 +7,21 @@
   <meta name="robots" content="noindex">
   <meta property="og:title" content="Mis boletos — OWG">
   <meta property="og:description" content="Tus boletos con QR en la app oficial de lucha libre.">
+  <link rel="stylesheet" href="/shared/owg-tokens.css">
+  <link rel="stylesheet" href="/shared/owg-ui.css">
   <link rel="stylesheet" href="/shared/owg-postcompra.css">
 </head>
-<body data-owg-boletos-build="2026-07-06-v9">
-  <div class="wrap">
-    <div class="brand"><h1>OWG</h1></div>
+<body class="owg-body" data-owg-boletos-build="2026-07-23-v10">
+  <div class="owg-wrap wrap">
+    <div class="owg-brand brand"><h1>OWG</h1></div>
 
-    <div id="view-loading" class="card">
+    <div id="view-loading" class="owg-card card">
       <div class="spinner"></div>
-      <h2>CARGANDO TUS BOLETOS</h2>
+      <h2>Cargando tus boletos</h2>
       <p class="success-subtitle">Un momento…</p>
     </div>
 
-    <div id="view-success" class="card" hidden>
+    <div id="view-success" class="owg-card card" hidden>
       <div class="ok-icon">✓</div>
       <h2>¡Listo!</h2>
       <p class="success-subtitle">Tu boleto también está en el correo.</p>
@@ -28,42 +30,42 @@
       <div id="tickets"></div>
 
       <div class="conversion-card">
-        <h3>🎭 Vive la Lucha Libre al 100% con la App OWG</h3>
+        <h3>Vive la lucha libre al 100% con la app OWG</h3>
         <ul class="benefits">
           <li>
-            <span class="benefit-icon" aria-hidden="true">🔒</span>
+            <span class="benefit-icon" aria-hidden="true">●</span>
             <div class="benefit-text">
-              <strong>Acceso Seguro</strong>
+              <strong>Acceso seguro</strong>
               <p>Tu boleto se sincroniza al instante. Olvídate de buscar en el correo.</p>
             </div>
           </li>
           <li>
-            <span class="benefit-icon" aria-hidden="true">👆</span>
+            <span class="benefit-icon" aria-hidden="true">●</span>
             <div class="benefit-text">
-              <strong>Sigue a tus Ídolos</strong>
+              <strong>Sigue a tus ídolos</strong>
               <p>Recibe alertas en tiempo real cuando tus luchadores favoritos tengan función.</p>
             </div>
           </li>
           <li>
-            <span class="benefit-icon" aria-hidden="true">🏟️</span>
+            <span class="benefit-icon" aria-hidden="true">●</span>
             <div class="benefit-text">
-              <strong>Arenas Locales</strong>
+              <strong>Arenas locales</strong>
               <p>Entérate antes que nadie de las carteleras de tu ciudad y empresas independientes.</p>
             </div>
           </li>
         </ul>
         <p class="linked-email">Tu cuenta ya está vinculada a:<br><strong id="recovery-email">—</strong></p>
-        <p class="activation-hint">Para activar estos beneficios, solo descarga la app y regístrate con este mismo correo.</p>
+        <p class="activation-hint">Para activar estos beneficios, descarga la app y regístrate con este mismo correo.</p>
       </div>
 
       <div class="store-buttons">
-        <a id="btn-app-store" class="store-btn" href="#" target="_blank" rel="noopener noreferrer">Descargar en App Store</a>
-        <a id="btn-play-store" class="store-btn store-btn--play" href="#" target="_blank" rel="noopener noreferrer">Descargar en Play Store</a>
+        <a id="btn-app-store" class="owg-btn owg-btn--store store-btn" href="#" target="_blank" rel="noopener noreferrer">Descargar en App Store</a>
+        <a id="btn-play-store" class="owg-btn owg-btn--store owg-btn--store-alt store-btn store-btn--play" href="#" target="_blank" rel="noopener noreferrer">Descargar en Play Store</a>
       </div>
     </div>
 
-    <div id="view-pending" class="card" hidden>
-      <h2>BOLETOS EN CAMINO</h2>
+    <div id="view-pending" class="owg-card card" hidden>
+      <h2>Boletos en camino</h2>
       <p class="success-subtitle">
         Tu pago puede estar confirmándose. Revisa tu correo en unos minutos — ahí estarán tus boletos con QR.
       </p>

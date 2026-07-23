@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Compra confirmada — OWG</title>
   <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/shared/owg-tokens.css">
+  <link rel="stylesheet" href="/shared/owg-ui.css">
   <link rel="stylesheet" href="/shared/owg-postcompra.css">
 </head>
-<body data-owg-callback-build="2026-07-06-v9">
-  <div class="wrap">
-    <div class="brand"><h1>OWG</h1></div>
+<body class="owg-body" data-owg-callback-build="2026-07-23-v10">
+  <div class="owg-wrap wrap">
+    <div class="owg-brand brand"><h1>OWG</h1></div>
 
-    <div id="view-loading" class="card">
+    <div id="view-loading" class="owg-card card">
       <div class="spinner"></div>
-      <h2>ASEGURANDO TUS LUGARES</h2>
+      <h2>Asegurando tus lugares</h2>
       <p class="success-subtitle">Confirmando el pago con Stripe…</p>
     </div>
 
-    <div id="view-success" class="card" hidden>
+    <div id="view-success" class="owg-card card" hidden>
       <div class="ok-icon">✓</div>
       <h2>¡Listo!</h2>
       <p class="success-subtitle">Tu boleto también está en el correo.</p>
@@ -26,50 +28,50 @@
       <div id="tickets"></div>
 
       <div class="conversion-card">
-        <h3>🎭 Vive la Lucha Libre al 100% con la App OWG</h3>
+        <h3>Vive la lucha libre al 100% con la app OWG</h3>
         <ul class="benefits">
           <li>
-            <span class="benefit-icon" aria-hidden="true">🔒</span>
+            <span class="benefit-icon" aria-hidden="true">●</span>
             <div class="benefit-text">
-              <strong>Acceso Seguro</strong>
+              <strong>Acceso seguro</strong>
               <p>Tu boleto se sincroniza al instante. Olvídate de buscar en el correo.</p>
             </div>
           </li>
           <li>
-            <span class="benefit-icon" aria-hidden="true">👆</span>
+            <span class="benefit-icon" aria-hidden="true">●</span>
             <div class="benefit-text">
-              <strong>Sigue a tus Ídolos</strong>
+              <strong>Sigue a tus ídolos</strong>
               <p>Recibe alertas en tiempo real cuando tus luchadores favoritos tengan función.</p>
             </div>
           </li>
           <li>
-            <span class="benefit-icon" aria-hidden="true">🏟️</span>
+            <span class="benefit-icon" aria-hidden="true">●</span>
             <div class="benefit-text">
-              <strong>Arenas Locales</strong>
+              <strong>Arenas locales</strong>
               <p>Entérate antes que nadie de las carteleras de tu ciudad y empresas independientes.</p>
             </div>
           </li>
         </ul>
         <p class="linked-email">Tu cuenta ya está vinculada a:<br><strong id="recovery-email">—</strong></p>
-        <p class="activation-hint">Para activar estos beneficios, solo descarga la app y regístrate con este mismo correo.</p>
+        <p class="activation-hint">Para activar estos beneficios, descarga la app y regístrate con este mismo correo.</p>
       </div>
 
       <div class="store-buttons">
-        <a id="btn-app-store" class="store-btn" href="#" target="_blank" rel="noopener noreferrer">Descargar en App Store</a>
-        <a id="btn-play-store" class="store-btn store-btn--play" href="#" target="_blank" rel="noopener noreferrer">Descargar en Play Store</a>
+        <a id="btn-app-store" class="owg-btn owg-btn--store store-btn" href="#" target="_blank" rel="noopener noreferrer">Descargar en App Store</a>
+        <a id="btn-play-store" class="owg-btn owg-btn--store owg-btn--store-alt store-btn store-btn--play" href="#" target="_blank" rel="noopener noreferrer">Descargar en Play Store</a>
       </div>
     </div>
 
-    <div id="view-pending" class="card" hidden>
-      <h2>PAGO EN PROCESO</h2>
+    <div id="view-pending" class="owg-card card" hidden>
+      <h2>Pago en proceso</h2>
       <p class="success-subtitle">
         Tu pago se está confirmando. En unos minutos llegará el correo con tus boletos y QR.
         Si ya pagaste, revisa tu bandeja o la carpeta de spam.
       </p>
     </div>
 
-    <div id="view-cancelled" class="card" hidden>
-      <h2>PAGO NO COMPLETADO</h2>
+    <div id="view-cancelled" class="owg-card card" hidden>
+      <h2>Pago no completado</h2>
       <p class="success-subtitle">Puedes volver al enlace del evento e intentar de nuevo.</p>
     </div>
   </div>
@@ -77,7 +79,7 @@
   <script src="/owg-app-config.js"></script>
   <script src="/shared/owg-postcompra.js"></script>
   <script>
-    /* owg-callback-build: 2026-07-06-v9 */
+    /* owg-callback-build: 2026-07-23-v10 */
     (function () {
       'use strict';
 
