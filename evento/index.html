@@ -292,7 +292,9 @@
       <!-- Flujo Instagram / Facebook / TikTok -->
       <div class="guide" id="guide">
         <p class="guide-label" id="guide-label">Un paso más</p>
-        <ol class="steps" id="steps">
+
+        <!-- Android: un botón puede abrir Chrome. iOS: Instagram no lo permite. -->
+        <ol class="steps" id="steps-ios">
           <li class="step">
             <span class="step-num" aria-hidden="true">1</span>
             <div>
@@ -311,16 +313,17 @@
             <span class="step-num" aria-hidden="true">3</span>
             <div>
               <p class="step-title">Descarga OWG</p>
-              <p class="step-desc">En tu navegador ya funciona la tienda.</p>
+              <p class="step-desc">En Safari ya funciona la tienda.</p>
             </div>
           </li>
         </ol>
 
         <div class="actions">
-          <button type="button" class="btn btn-primary" id="copy-link">Copiar enlace</button>
+          <button type="button" class="btn btn-primary" id="open-external">Abrir en Chrome</button>
+          <button type="button" class="btn btn-secondary" id="copy-link">Copiar enlace</button>
           <button type="button" class="btn btn-ghost" id="try-store">Probar abrir la tienda</button>
         </div>
-        <p class="toast" id="toast" role="status">Enlace copiado. Pégalo en Safari o Chrome.</p>
+        <p class="toast" id="toast" role="status">Enlace copiado. Pégalo en Safari.</p>
         <p class="footnote" id="footnote">
           Instagram bloquea descargas dentro de su app. No eres tú: es su navegador.
         </p>
@@ -354,9 +357,11 @@
       var openBtn = document.getElementById('open-app');
       var getBtn = document.getElementById('get-app');
       var copyBtn = document.getElementById('copy-link');
+      var openExternalBtn = document.getElementById('open-external');
       var tryStoreBtn = document.getElementById('try-store');
       var toast = document.getElementById('toast');
       var footnote = document.getElementById('footnote');
+      var stepsIos = document.getElementById('steps-ios');
       var step1Desc = document.getElementById('step1-desc');
       var step2Title = document.getElementById('step2-title');
       var step2Desc = document.getElementById('step2-desc');
@@ -368,6 +373,63 @@
         if (/TikTok|Bytedance/i.test(ua)) return 'TikTok';
         if (/Twitter/i.test(ua)) return 'X';
         return 'esta app';
+      }
+
+      /** Normaliza a https://www… para intents. */
+      function httpsShareUrl() {
+        try {
+          var u = new URL(shareUrl);
+          if (u.hostname === 'owg-app.com') u.hostname = 'www.owg-app.com';
+          u.protocol = 'https:';
+          return u.toString();
+        } catch (_) {
+          return shareUrl;
+        }
+      }
+
+      /**
+       * Intenta abrir el link en un navegador real (fuera de Instagram).
+       * Android: suele funcionar con Intent → Chrome.
+       * iOS: Instagram/Apple no lo permiten; devolvemos false.
+       */
+      function openInExternalBrowser(url) {
+        var target = url || httpsShareUrl();
+
+        if (isAndroid) {
+          var hostPath = target.replace(/^https?:\/\//i, '');
+          // 1) Chrome directo
+          window.location.href =
+            'intent://' + hostPath +
+            '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' +
+            encodeURIComponent(target) + ';end';
+          // 2) Si no hay Chrome, chooser del sistema
+          setTimeout(function () {
+            if (document.visibilityState !== 'visible') return;
+            window.location.href =
+              'intent://' + hostPath +
+              '#Intent;scheme=https;action=android.intent.action.VIEW;end';
+          }, 600);
+          return true;
+        }
+
+        if (isIOS) {
+          // No hay API pública fiable para forzar Safari desde Instagram.
+          // Intentos de cortesía (casi siempre los bloquea el WebView).
+          try {
+            window.location.href = 'x-safari-' + target;
+          } catch (_) {}
+          setTimeout(function () {
+            if (document.visibilityState === 'visible') {
+              try {
+                window.open(target, '_blank');
+              } catch (_) {}
+            }
+          }, 250);
+          return false;
+        }
+
+        window.open(target, '_blank');
+        return true;
       }
 
       function goStore() {
@@ -438,24 +500,45 @@
         body.classList.add('mode-inapp');
 
         var name = appName();
-        headline.textContent = 'Casi listo';
-        lede.textContent =
-          name + ' abre un navegador limitado. En 2 toques sales y ya puedes instalar OWG.';
-        guideLabel.textContent = 'Cómo continuar';
-        step1Desc.textContent = 'Esquina superior derecha de ' + name + '.';
-        if (isIOS) {
+        var link = httpsShareUrl();
+
+        if (isAndroid) {
+          // Un toque → Chrome con el mismo link.
+          if (stepsIos) stepsIos.classList.add('hidden');
+          headline.textContent = 'Ábrelo fuera de ' + name;
+          lede.textContent =
+            'Un toque abre Chrome con este evento. Ahí sí puedes descargar OWG.';
+          guideLabel.textContent = 'Recomendado';
+          openExternalBtn.textContent = 'Abrir en Chrome';
+          footnote.textContent =
+            'Si Chrome no responde, usa «Copiar enlace» y pégalo en el navegador.';
+          toast.textContent = 'Enlace copiado. Pégalo en Chrome.';
+        } else {
+          // iPhone: Instagram/Apple bloquean abrir Safari por botón.
+          headline.textContent = 'Casi listo';
+          lede.textContent =
+            'En iPhone, ' + name + ' no deja que un botón abra Safari. Copia el enlace o usa ···';
+          guideLabel.textContent = 'Cómo continuar';
+          step1Desc.textContent = 'Esquina superior derecha de ' + name + '.';
           step2Title.textContent = 'Abrir en Safari';
           step2Desc.textContent = 'Elige “Abrir en Safari” (o “Abrir en el navegador”).';
-        } else {
-          step2Title.textContent = 'Abrir en Chrome';
-          step2Desc.textContent = 'Elige “Abrir en Chrome” o “Abrir en el navegador”.';
+          openExternalBtn.textContent = 'Intentar abrir Safari';
+          footnote.textContent =
+            'Limitación de Apple + ' + name + ': no hay botón que abra Safari de forma fiable.';
+          toast.textContent = 'Enlace copiado. Pégalo en Safari.';
         }
-        footnote.textContent =
-          name + ' bloquea las tiendas de apps por seguridad. Abrir en el navegador lo resuelve.';
 
-        // Copiar el enlace del evento (mejor UX: al abrirlo fuera, ven el chooser completo).
+        openExternalBtn.addEventListener('click', function () {
+          var ok = openInExternalBrowser(link);
+          if (!ok && isIOS) {
+            // Si no salió, copiar automáticamente (mejor UX en iPhone).
+            copy(link, 'Enlace copiado');
+            lede.textContent =
+              'No se pudo abrir Safari desde aquí. Ya copiamos el enlace: pégalo en Safari.';
+          }
+        });
         copyBtn.addEventListener('click', function () {
-          copy(shareUrl, 'Enlace copiado');
+          copy(link, 'Enlace copiado');
         });
         tryStoreBtn.addEventListener('click', function () {
           goStore();
