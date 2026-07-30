@@ -59,15 +59,14 @@
       <a id="get-app" class="owg-btn owg-btn--secondary" href="https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share">Descargar la app</a>
     </div>
     <p class="owg-hint" id="hint">
-      Si ya tienes OWG, ábrela. Si no, descárgala gratis en la tienda.
+      Si ya tienes OWG, úsala. Si no, toca Descargar para ir a la tienda.
     </p>
   </div>
-  <!-- Config opcional; owg-store.js trae fallbacks si falta el archivo (404). -->
   <script src="/owg-app-config.js"></script>
   <script src="/shared/owg-store.js"></script>
   <script>
     (function () {
-      var Store = window.OwgStore || null;
+      var Store = window.OwgStore;
       var params = new URLSearchParams(window.location.search);
       var fromQuery = params.get('id');
       var fromPath = window.location.pathname.match(/\/evento\/(\d+)/);
@@ -84,16 +83,18 @@
       var storeUrl = isIOS ? appStore : playStore;
 
       var statusEl = document.getElementById('status');
-      var actionsEl = document.getElementById('actions');
       var openBtn = document.getElementById('open-app');
       var getBtn = document.getElementById('get-app');
 
+      // Descargar siempre a HTTPS de tienda (nunca owg://).
       if (Store) {
         Store.bindStoreLink(getBtn, storeUrl);
       } else {
         getBtn.href = storeUrl;
-        getBtn.target = '_blank';
-        getBtn.rel = 'noopener noreferrer';
+        getBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          window.location.assign(storeUrl);
+        });
       }
 
       if (!eventId || !/^\d+$/.test(String(eventId))) {
@@ -101,7 +102,6 @@
           'Enlace de evento no válido. Comparte de nuevo desde la cartelera OWG.';
         getBtn.textContent = 'Descargar OWG';
         openBtn.style.display = 'none';
-        actionsEl.style.display = 'flex';
         return;
       }
 
@@ -116,17 +116,8 @@
         '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
         encodeURIComponent(storeUrl) + ';end';
 
-      openBtn.href = isAndroid ? intentLink : deepLink;
-      openBtn.addEventListener('click', function (e) {
-        if (!isAndroid) return;
-        e.preventDefault();
-        window.location.href = intentLink;
-      });
-
-      // Mostrar chooser de inmediato (Abrir / Descargar). No depender de Universal Links.
       statusEl.textContent =
-        '¿Tienes OWG? Ábrela. Si no, descárgala gratis.';
-      actionsEl.style.display = 'flex';
+        '¿Tienes OWG? Ábrela. Si no, descarga la app gratis.';
 
       if (!isAndroid && !isIOS) {
         statusEl.textContent =
@@ -136,13 +127,36 @@
         return;
       }
 
-      // Intento suave de abrir la app; si no está, el usuario usa «Descargar».
-      // No redirigimos solos a la tienda (antes fallaba si faltaba la config).
-      setTimeout(function () {
-        try {
-          window.location.href = isAndroid ? intentLink : deepLink;
-        } catch (_) {}
-      }, 500);
+      // Solo al tocar «Abrir» — NO auto-redirigir a owg:// (rompe Safari si no hay app).
+      if (Store) {
+        Store.bindOpenAppLink(openBtn, {
+          deepLink: deepLink,
+          intentLink: intentLink,
+          storeUrl: storeUrl,
+        });
+      } else {
+        openBtn.href = '#';
+        openBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (isAndroid) {
+            window.location.href = intentLink;
+          } else {
+            var ifr = document.createElement('iframe');
+            ifr.style.display = 'none';
+            ifr.src = deepLink;
+            document.body.appendChild(ifr);
+          }
+        });
+      }
+
+      // Si tocó Abrir y la app no está, tras unos segundos avisar (la página sigue viva).
+      openBtn.addEventListener('click', function () {
+        setTimeout(function () {
+          if (document.visibilityState !== 'visible') return;
+          statusEl.textContent =
+            'Si no se abrió OWG, toca «Descargar la app» para ir a la tienda.';
+        }, 2200);
+      });
     })();
   </script>
 </body>

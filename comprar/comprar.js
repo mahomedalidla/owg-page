@@ -336,12 +336,22 @@
     }
 
     var cfg = window.OWG_APP_CONFIG || {};
-    var playStore = cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app';
-    var appStore =
-      typeof cfg.appStoreUrl === 'function' ? cfg.appStoreUrl() : cfg.appStoreSearchUrl;
-    var isAndroid = /Android/i.test(navigator.userAgent);
-    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var Store = window.OwgStore;
+    var playStore = Store
+      ? Store.playStoreUrl()
+      : cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share';
+    var appStore = Store
+      ? Store.appStoreUrl()
+      : typeof cfg.appStoreUrl === 'function'
+        ? cfg.appStoreUrl()
+        : cfg.appStoreSearchUrl ||
+          'https://apps.apple.com/us/app/owg-wrestling-y-lucha-libre/id6780648941';
+    var isAndroid = Store ? Store.isAndroid() : /Android/i.test(navigator.userAgent);
+    var isIOS = Store ? Store.isIOS() : /iPhone|iPad|iPod/i.test(navigator.userAgent);
     var storeUrl = isIOS ? appStore : playStore;
+    if (!storeUrl) {
+      storeUrl = playStore;
+    }
     var deepLink = 'owg://evento/' + eventId;
     var intentLink =
       'intent://evento/' +
@@ -350,13 +360,32 @@
       encodeURIComponent(storeUrl) +
       ';end';
 
-    elChooserStore.href = storeUrl;
-    elChooserApp.href = isAndroid ? intentLink : deepLink;
-    elChooserApp.addEventListener('click', function (e) {
-      if (!isAndroid) return;
-      e.preventDefault();
-      window.location.href = intentLink;
-    });
+    if (Store) {
+      Store.bindStoreLink(elChooserStore, storeUrl);
+      Store.bindOpenAppLink(elChooserApp, {
+        deepLink: deepLink,
+        intentLink: intentLink,
+        storeUrl: storeUrl,
+      });
+    } else {
+      elChooserStore.href = storeUrl;
+      elChooserStore.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.assign(storeUrl);
+      });
+      elChooserApp.href = '#';
+      elChooserApp.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (isAndroid) {
+          window.location.href = intentLink;
+        } else {
+          var ifr = document.createElement('iframe');
+          ifr.style.display = 'none';
+          ifr.src = deepLink;
+          document.body.appendChild(ifr);
+        }
+      });
+    }
     elChooserWeb.addEventListener('click', function () {
       markWebPreference();
       startWebCheckout();

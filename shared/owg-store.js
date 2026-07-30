@@ -1,6 +1,5 @@
 /**
  * URLs de tienda OWG — no dependen de que exista /owg-app-config.js
- * (en producción ese archivo a veces no está desplegado → botón Descargar muerto).
  */
 (function (global) {
   'use strict';
@@ -40,33 +39,72 @@
     return /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
   }
 
-  /** URL de tienda según el dispositivo (desktop → Play como fallback útil). */
   function storeUrlForDevice() {
     return isIOS() ? appStoreUrl() : playStoreUrl();
   }
 
+  /** Abre la ficha de tienda (misma pestaña; fiable en Safari/Chrome móvil). */
+  function goToStore(url) {
+    var href = url || storeUrlForDevice();
+    window.location.assign(href);
+  }
+
   /**
-   * Enlaza un <a> a la tienda. Siempre deja href usable + click de respaldo.
+   * Intenta abrir la app sin romper la página si no está instalada.
+   * iOS: iframe + owg:// (location.href a custom scheme deja Safari inutilizable).
+   * Android: intent con fallback a la tienda.
    */
+  function tryOpenApp(opts) {
+    opts = opts || {};
+    var deepLink = opts.deepLink || 'owg://';
+    var intentLink = opts.intentLink;
+    var storeUrl = opts.storeUrl || storeUrlForDevice();
+
+    if (isAndroid()) {
+      window.location.href =
+        intentLink ||
+        'intent://#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
+          encodeURIComponent(storeUrl) +
+          ';end';
+      return;
+    }
+
+    if (isIOS()) {
+      var ifr = document.createElement('iframe');
+      ifr.setAttribute('aria-hidden', 'true');
+      ifr.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute';
+      ifr.src = deepLink;
+      document.body.appendChild(ifr);
+      setTimeout(function () {
+        try {
+          document.body.removeChild(ifr);
+        } catch (_) {}
+      }, 2000);
+      return;
+    }
+
+    window.location.assign(storeUrl);
+  }
+
   function bindStoreLink(el, url) {
     if (!el) return;
     var href = url || storeUrlForDevice();
     el.setAttribute('href', href);
-    el.setAttribute('target', '_blank');
+    el.removeAttribute('target');
     el.setAttribute('rel', 'noopener noreferrer');
     el.addEventListener('click', function (e) {
-      // Evita quedarse en href="#" si algo falló al setear.
-      var go = el.getAttribute('href') || href;
-      if (!go || go === '#' || go === window.location.href) {
-        e.preventDefault();
-        window.location.href = href;
-        return;
-      }
-      // En WebViews a veces target=_blank no abre la tienda.
-      if (isIOS() || isAndroid()) {
-        e.preventDefault();
-        window.location.href = go;
-      }
+      e.preventDefault();
+      goToStore(href);
+    });
+  }
+
+  function bindOpenAppLink(el, opts) {
+    if (!el) return;
+    opts = opts || {};
+    el.setAttribute('href', opts.deepLink || '#');
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      tryOpenApp(opts);
     });
   }
 
@@ -76,6 +114,9 @@
     storeUrlForDevice: storeUrlForDevice,
     isAndroid: isAndroid,
     isIOS: isIOS,
+    goToStore: goToStore,
+    tryOpenApp: tryOpenApp,
     bindStoreLink: bindStoreLink,
+    bindOpenAppLink: bindOpenAppLink,
   };
 })(window);
