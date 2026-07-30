@@ -320,7 +320,7 @@
 
         <div class="actions">
           <button type="button" class="btn btn-primary" id="open-external">Abrir en Chrome</button>
-          <button type="button" class="btn btn-secondary" id="copy-link">Copiar enlace</button>
+          <button type="button" class="btn btn-primary" id="copy-link">Copiar enlace</button>
           <button type="button" class="btn btn-ghost" id="try-store">Probar abrir la tienda</button>
         </div>
         <p class="toast" id="toast" role="status">Enlace copiado. Pégalo en Safari.</p>
@@ -413,18 +413,7 @@
         }
 
         if (isIOS) {
-          // No hay API pública fiable para forzar Safari desde Instagram.
-          // Intentos de cortesía (casi siempre los bloquea el WebView).
-          try {
-            window.location.href = 'x-safari-' + target;
-          } catch (_) {}
-          setTimeout(function () {
-            if (document.visibilityState === 'visible') {
-              try {
-                window.open(target, '_blank');
-              } catch (_) {}
-            }
-          }, 250);
+          // No intentar esquemas tipo x-safari-: ciclan la misma página en Instagram.
           return false;
         }
 
@@ -510,33 +499,31 @@
             'Un toque abre Chrome con este evento. Ahí sí puedes descargar OWG.';
           guideLabel.textContent = 'Recomendado';
           openExternalBtn.textContent = 'Abrir en Chrome';
+          openExternalBtn.classList.remove('hidden');
+          copyBtn.classList.remove('btn-primary');
+          copyBtn.classList.add('btn-secondary');
           footnote.textContent =
             'Si Chrome no responde, usa «Copiar enlace» y pégalo en el navegador.';
           toast.textContent = 'Enlace copiado. Pégalo en Chrome.';
+
+          openExternalBtn.addEventListener('click', function () {
+            openInExternalBrowser(link);
+          });
         } else {
-          // iPhone: Instagram/Apple bloquean abrir Safari por botón.
+          // iPhone: no hay forma fiable de abrir Safari; el intento cicla la misma página.
+          if (openExternalBtn) openExternalBtn.classList.add('hidden');
           headline.textContent = 'Casi listo';
           lede.textContent =
-            'En iPhone, ' + name + ' no deja que un botón abra Safari. Copia el enlace o usa ···';
+            'Copia el enlace y ábrelo en Safari, o usa ··· arriba a la derecha.';
           guideLabel.textContent = 'Cómo continuar';
           step1Desc.textContent = 'Esquina superior derecha de ' + name + '.';
           step2Title.textContent = 'Abrir en Safari';
           step2Desc.textContent = 'Elige “Abrir en Safari” (o “Abrir en el navegador”).';
-          openExternalBtn.textContent = 'Intentar abrir Safari';
           footnote.textContent =
-            'Limitación de Apple + ' + name + ': no hay botón que abra Safari de forma fiable.';
+            name + ' en iPhone no permite abrir Safari con un botón. Copiar el enlace es lo más limpio.';
           toast.textContent = 'Enlace copiado. Pégalo en Safari.';
         }
 
-        openExternalBtn.addEventListener('click', function () {
-          var ok = openInExternalBrowser(link);
-          if (!ok && isIOS) {
-            // Si no salió, copiar automáticamente (mejor UX en iPhone).
-            copy(link, 'Enlace copiado');
-            lede.textContent =
-              'No se pudo abrir Safari desde aquí. Ya copiamos el enlace: pégalo en Safari.';
-          }
-        });
         copyBtn.addEventListener('click', function () {
           copy(link, 'Enlace copiado');
         });
