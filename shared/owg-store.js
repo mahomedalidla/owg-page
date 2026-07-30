@@ -285,4 +285,36 @@
     mountInAppHelp: mountInAppHelp,
     copyText: copyText,
   };
+
+  // Auto: si hay pantalla puente con Descargar y estamos en Instagram/FB,
+  // monta el aviso aunque el HTML viejo no llame mountInAppHelp.
+  function autoMountInAppHelp() {
+    if (!isInAppBrowser()) return;
+    var card =
+      document.querySelector('.owg-card') ||
+      document.getElementById('chooser') ||
+      document.body;
+    if (!card) return;
+    mountInAppHelp(card, { copyUrl: storeUrlForDevice() });
+
+    var getBtn =
+      document.getElementById('get-app') ||
+      document.getElementById('chooser-store') ||
+      document.getElementById('btn-app-store');
+    if (getBtn && !getBtn.getAttribute('data-owg-store-bound')) {
+      getBtn.setAttribute('data-owg-store-bound', '1');
+      bindStoreLink(getBtn, storeUrlForDevice());
+    }
+
+    var hint = document.getElementById('hint') || document.getElementById('status');
+    if (hint) {
+      hint.textContent = openExternalBrowserHint();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoMountInAppHelp);
+  } else {
+    autoMountInAppHelp();
+  }
 })(window);

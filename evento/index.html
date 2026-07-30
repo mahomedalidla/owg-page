@@ -47,10 +47,32 @@
       gap: 10px;
       align-items: stretch;
     }
+    /* Banner Instagram/FB — HTML en la página (no depende de JS externo). */
+    #inapp-banner {
+      display: none;
+      margin: 0 0 16px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(229, 9, 20, 0.45);
+      background: rgba(229, 9, 20, 0.12);
+      text-align: left;
+    }
+    #inapp-banner.is-on { display: block; }
+    #inapp-banner strong { display: block; margin-bottom: 6px; font-size: 14px; }
+    #inapp-banner p { margin: 0 0 10px; font-size: 13px; line-height: 1.45; color: var(--owg-text-secondary); }
+    #inapp-copied { display: none; margin: 8px 0 0; font-size: 12px; color: var(--owg-text-secondary); }
+    #inapp-copied.is-on { display: block; }
   </style>
 </head>
 <body class="owg-body">
   <div class="owg-card">
+    <div id="inapp-banner">
+      <strong id="inapp-title">Estás dentro de Instagram</strong>
+      <p id="inapp-body">Toca ··· (arriba a la derecha) → Abrir en Safari o Chrome. Ahí sí podrás descargar OWG.</p>
+      <button type="button" id="inapp-copy" class="owg-btn owg-btn--secondary">Copiar enlace de descarga</button>
+      <p id="inapp-copied">Enlace copiado. Ábrelo en Safari o Chrome.</p>
+    </div>
+
     <img class="owg-brand-logo" src="/shared/logo-letras.svg" alt="OWG" width="160" height="74">
     <p class="sub">Official Wrestling Group</p>
     <p id="status">Elige cómo continuar</p>
@@ -66,41 +88,100 @@
   <script src="/shared/owg-store.js"></script>
   <script>
     (function () {
-      var Store = window.OwgStore;
+      var STORE_IOS = 'https://apps.apple.com/us/app/owg-wrestling-y-lucha-libre/id6780648941';
+      var STORE_PLAY = 'https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share';
+      var ITMS = 'itms-apps://apps.apple.com/app/id6780648941';
+      var MARKET = 'market://details?id=com.owg.app';
+
+      var ua = navigator.userAgent || '';
+      var isAndroid = /Android/i.test(ua);
+      var isIOS = /iPhone|iPad|iPod/i.test(ua);
+      var inApp = /Instagram|FBAN|FBAV|FB_IAB|Messenger|Line\/|Twitter|TikTok|Bytedance|Snapchat|LinkedInApp|MicroMessenger/i.test(ua);
+      var storeUrl = isIOS ? STORE_IOS : STORE_PLAY;
+
       var params = new URLSearchParams(window.location.search);
       var fromQuery = params.get('id');
       var fromPath = window.location.pathname.match(/\/evento\/(\d+)/);
       var eventId = fromQuery || (fromPath ? fromPath[1] : null);
 
-      var isAndroid = Store ? Store.isAndroid() : /Android/i.test(navigator.userAgent);
-      var isIOS = Store ? Store.isIOS() : /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      var playStore = Store
-        ? Store.playStoreUrl()
-        : 'https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share';
-      var appStore = Store
-        ? Store.appStoreUrl()
-        : 'https://apps.apple.com/us/app/owg-wrestling-y-lucha-libre/id6780648941';
-      var storeUrl = isIOS ? appStore : playStore;
-
       var statusEl = document.getElementById('status');
       var openBtn = document.getElementById('open-app');
       var getBtn = document.getElementById('get-app');
+      var hintEl = document.getElementById('hint');
+      var banner = document.getElementById('inapp-banner');
+      var inappTitle = document.getElementById('inapp-title');
+      var inappBody = document.getElementById('inapp-body');
+      var inappCopy = document.getElementById('inapp-copy');
+      var inappCopied = document.getElementById('inapp-copied');
 
-      // Descargar siempre a HTTPS de tienda (nunca owg://).
-      if (Store) {
-        Store.bindStoreLink(getBtn, storeUrl);
-      } else {
-        getBtn.href = storeUrl;
-        getBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          window.location.assign(storeUrl);
+      function appName() {
+        if (/Instagram/i.test(ua)) return 'Instagram';
+        if (/FBAN|FBAV|FB_IAB|Messenger/i.test(ua)) return 'Facebook';
+        if (/TikTok|Bytedance/i.test(ua)) return 'TikTok';
+        if (/Twitter/i.test(ua)) return 'X';
+        return 'esta app';
+      }
+
+      function goStore() {
+        if (inApp) {
+          try { window.location.href = isIOS ? ITMS : MARKET; } catch (_) {}
+          if (isAndroid) {
+            setTimeout(function () {
+              var host = STORE_PLAY.replace(/^https?:\/\//i, '');
+              window.location.href =
+                'intent://' + host +
+                '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' +
+                encodeURIComponent(STORE_PLAY) + ';end';
+            }, 350);
+          } else {
+            setTimeout(function () {
+              if (document.visibilityState === 'visible') {
+                window.location.href = STORE_IOS;
+              }
+            }, 800);
+          }
+          return;
+        }
+        window.location.assign(storeUrl);
+      }
+
+      getBtn.href = storeUrl;
+      getBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        goStore();
+      });
+
+      if (inApp) {
+        banner.classList.add('is-on');
+        inappTitle.textContent = 'Estás dentro de ' + appName();
+        inappBody.textContent = isIOS
+          ? 'Toca ··· (arriba a la derecha) → Abrir en Safari. Ahí sí podrás descargar OWG.'
+          : 'Toca ··· (arriba a la derecha) → Abrir en Chrome. Ahí sí podrás descargar OWG.';
+        statusEl.textContent = 'Para instalar OWG, abre esta página en tu navegador.';
+        hintEl.textContent = inappBody.textContent;
+        getBtn.textContent = 'Intentar abrir la tienda';
+
+        inappCopy.addEventListener('click', function () {
+          var text = storeUrl;
+          function ok() {
+            inappCopied.classList.add('is-on');
+            inappCopy.textContent = '¡Enlace copiado!';
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(ok, function () {
+              window.prompt('Copia este enlace:', text);
+            });
+          } else {
+            window.prompt('Copia este enlace:', text);
+            ok();
+          }
         });
       }
 
       if (!eventId || !/^\d+$/.test(String(eventId))) {
         statusEl.textContent =
           'Enlace de evento no válido. Comparte de nuevo desde la cartelera OWG.';
-        getBtn.textContent = 'Descargar OWG';
+        getBtn.textContent = inApp ? 'Intentar abrir la tienda' : 'Descargar OWG';
         openBtn.style.display = 'none';
         return;
       }
@@ -116,8 +197,10 @@
         '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
         encodeURIComponent(storeUrl) + ';end';
 
-      statusEl.textContent =
-        '¿Tienes OWG? Ábrela. Si no, descarga la app gratis.';
+      if (!inApp) {
+        statusEl.textContent =
+          '¿Tienes OWG? Ábrela. Si no, descarga la app gratis.';
+      }
 
       if (!isAndroid && !isIOS) {
         statusEl.textContent =
@@ -127,34 +210,26 @@
         return;
       }
 
-      // Solo al tocar «Abrir» — NO auto-redirigir a owg:// (rompe Safari si no hay app).
-      if (Store) {
-        Store.bindOpenAppLink(openBtn, {
-          deepLink: deepLink,
-          intentLink: intentLink,
-          storeUrl: storeUrl,
-        });
-      } else {
-        openBtn.href = '#';
-        openBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          if (isAndroid) {
-            window.location.href = intentLink;
-          } else {
-            var ifr = document.createElement('iframe');
-            ifr.style.display = 'none';
-            ifr.src = deepLink;
-            document.body.appendChild(ifr);
-          }
-        });
-      }
-
-      // Si tocó Abrir y la app no está, tras unos segundos avisar (la página sigue viva).
-      openBtn.addEventListener('click', function () {
+      openBtn.href = '#';
+      openBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (inApp) {
+          goStore();
+          return;
+        }
+        if (isAndroid) {
+          window.location.href = intentLink;
+          return;
+        }
+        var ifr = document.createElement('iframe');
+        ifr.style.display = 'none';
+        ifr.src = deepLink;
+        document.body.appendChild(ifr);
         setTimeout(function () {
-          if (document.visibilityState !== 'visible') return;
-          statusEl.textContent =
-            'Si no se abrió OWG, toca «Descargar la app» para ir a la tienda.';
+          if (document.visibilityState === 'visible') {
+            statusEl.textContent =
+              'Si no se abrió OWG, toca «Descargar la app».';
+          }
         }, 2200);
       });
     })();
