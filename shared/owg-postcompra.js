@@ -5,11 +5,17 @@
   'use strict';
 
   function storeUrls() {
+    if (global.OwgStore) {
+      return {
+        playStore: global.OwgStore.playStoreUrl(),
+        appStore: global.OwgStore.appStoreUrl(),
+      };
+    }
     var cfg = global.OWG_APP_CONFIG || {};
-    var playStore = cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app';
+    var playStore = cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share';
     var appStore = typeof cfg.appStoreUrl === 'function' ? cfg.appStoreUrl() : cfg.appStoreUrl;
     if (!appStore) {
-      appStore = cfg.appStoreSearchUrl || 'https://apps.apple.com/search?term=OWG+wrestling+lucha+libre';
+      appStore = cfg.appStoreSearchUrl || 'https://apps.apple.com/us/app/owg-wrestling-y-lucha-libre/id6780648941';
     }
     return { playStore: playStore, appStore: appStore };
   }
@@ -97,6 +103,11 @@
     var urls = storeUrls();
     var appBtn = root.getElementById('btn-app-store');
     var playBtn = root.getElementById('btn-play-store');
+    if (global.OwgStore) {
+      if (appBtn) global.OwgStore.bindStoreLink(appBtn, urls.appStore);
+      if (playBtn) global.OwgStore.bindStoreLink(playBtn, urls.playStore);
+      return;
+    }
     if (appBtn) appBtn.href = urls.appStore;
     if (playBtn) playBtn.href = urls.playStore;
   }

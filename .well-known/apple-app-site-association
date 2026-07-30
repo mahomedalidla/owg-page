@@ -3,12 +3,12 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAMID.com.owg.app",
+        "appID": "3DRJH6Y3F5.com.owg.app",
         "paths": [
           "/auth/callback",
           "/auth/callback/*",
-          "/evento/*",
-          "/evento/index.html"
+          "/boletos/*",
+          "/boletos/index.html"
         ]
       }
     ]

@@ -53,28 +53,34 @@
   <div class="owg-card">
     <img class="owg-brand-logo" src="/shared/logo-letras.svg" alt="OWG" width="160" height="74">
     <p class="sub">Official Wrestling Group</p>
-    <p id="status">Abriendo cartelera del evento…</p>
-    <div class="actions" id="actions" style="display:none">
+    <p id="status">Elige cómo continuar</p>
+    <div class="actions" id="actions">
       <a id="open-app" class="owg-btn" href="#">Abrir en OWG</a>
-      <a id="get-app" class="owg-btn owg-btn--secondary" href="#">Descargar la app</a>
+      <a id="get-app" class="owg-btn owg-btn--secondary" href="https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share">Descargar la app</a>
     </div>
     <p class="owg-hint" id="hint">
-      Si ya tienes OWG, el evento se abrirá en la app. Si no, te llevamos a la tienda.
+      Si ya tienes OWG, ábrela. Si no, descárgala gratis en la tienda.
     </p>
   </div>
+  <!-- Config opcional; owg-store.js trae fallbacks si falta el archivo (404). -->
   <script src="/owg-app-config.js"></script>
+  <script src="/shared/owg-store.js"></script>
   <script>
     (function () {
-      var cfg = window.OWG_APP_CONFIG || {};
+      var Store = window.OwgStore || null;
       var params = new URLSearchParams(window.location.search);
       var fromQuery = params.get('id');
       var fromPath = window.location.pathname.match(/\/evento\/(\d+)/);
       var eventId = fromQuery || (fromPath ? fromPath[1] : null);
 
-      var playStore = cfg.playStoreUrl || 'https://play.google.com/store/apps/details?id=com.owg.app';
-      var appStore = typeof cfg.appStoreUrl === 'function' ? cfg.appStoreUrl() : cfg.appStoreSearchUrl;
-      var isAndroid = /Android/i.test(navigator.userAgent);
-      var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      var isAndroid = Store ? Store.isAndroid() : /Android/i.test(navigator.userAgent);
+      var isIOS = Store ? Store.isIOS() : /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      var playStore = Store
+        ? Store.playStoreUrl()
+        : 'https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share';
+      var appStore = Store
+        ? Store.appStoreUrl()
+        : 'https://apps.apple.com/us/app/owg-wrestling-y-lucha-libre/id6780648941';
       var storeUrl = isIOS ? appStore : playStore;
 
       var statusEl = document.getElementById('status');
@@ -82,14 +88,20 @@
       var openBtn = document.getElementById('open-app');
       var getBtn = document.getElementById('get-app');
 
-      getBtn.href = storeUrl;
+      if (Store) {
+        Store.bindStoreLink(getBtn, storeUrl);
+      } else {
+        getBtn.href = storeUrl;
+        getBtn.target = '_blank';
+        getBtn.rel = 'noopener noreferrer';
+      }
 
       if (!eventId || !/^\d+$/.test(String(eventId))) {
         statusEl.textContent =
           'Enlace de evento no válido. Comparte de nuevo desde la cartelera OWG.';
         getBtn.textContent = 'Descargar OWG';
-        actionsEl.style.display = 'flex';
         openBtn.style.display = 'none';
+        actionsEl.style.display = 'flex';
         return;
       }
 
@@ -105,62 +117,32 @@
         encodeURIComponent(storeUrl) + ';end';
 
       openBtn.href = isAndroid ? intentLink : deepLink;
-
       openBtn.addEventListener('click', function (e) {
         if (!isAndroid) return;
         e.preventDefault();
         window.location.href = intentLink;
       });
 
-      function mostrarOpciones() {
-        statusEl.textContent =
-          '¿Tienes OWG? Abre el evento. Si no, descarga la app gratis.';
-        actionsEl.style.display = 'flex';
-      }
+      // Mostrar chooser de inmediato (Abrir / Descargar). No depender de Universal Links.
+      statusEl.textContent =
+        '¿Tienes OWG? Ábrela. Si no, descárgala gratis.';
+      actionsEl.style.display = 'flex';
 
-      var appPareceAbierta = false;
-      var redirigirTiendaProgramado = false;
-
-      function cancelarRedireccionTienda() {
-        redirigirTiendaProgramado = false;
-      }
-
-      function programarRedireccionTienda(ms) {
-        redirigirTiendaProgramado = true;
-        setTimeout(function () {
-          if (!redirigirTiendaProgramado || appPareceAbierta) return;
-          window.location.href = storeUrl;
-        }, ms);
-      }
-
-      document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'hidden') {
-          appPareceAbierta = true;
-          cancelarRedireccionTienda();
-        }
-      });
-
-      window.addEventListener('pagehide', function () {
-        appPareceAbierta = true;
-        cancelarRedireccionTienda();
-      });
-
-      if (isAndroid) {
-        window.location.href = intentLink;
-        setTimeout(mostrarOpciones, 2200);
-      } else if (isIOS) {
-        window.location.href = deepLink;
-        programarRedireccionTienda(3200);
-        setTimeout(function () {
-          if (!appPareceAbierta) mostrarOpciones();
-        }, 2800);
-      } else {
+      if (!isAndroid && !isIOS) {
         statusEl.textContent =
           'Abre este enlace en tu celular para ver la cartelera en OWG.';
-        actionsEl.style.display = 'flex';
         openBtn.textContent = 'Ir a owg-app.com';
         openBtn.href = 'https://owg-app.com';
+        return;
       }
+
+      // Intento suave de abrir la app; si no está, el usuario usa «Descargar».
+      // No redirigimos solos a la tienda (antes fallaba si faltaba la config).
+      setTimeout(function () {
+        try {
+          window.location.href = isAndroid ? intentLink : deepLink;
+        } catch (_) {}
+      }, 500);
     })();
   </script>
 </body>
