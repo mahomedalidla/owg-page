@@ -484,6 +484,39 @@
         getBtn.textContent = 'Descargar OWG';
       }
 
+      var deepLink = eventId && /^\d+$/.test(String(eventId))
+        ? 'owg://evento/' + eventId
+        : 'owg://';
+      var intentLink =
+        'intent://evento/' + (eventId || '') +
+        '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
+        encodeURIComponent(storeUrl) + ';end';
+
+      /** Abre la app si está instalada sin romper la página (iOS = iframe). */
+      function tryOpenInstalledApp() {
+        if (!eventId || !/^\d+$/.test(String(eventId))) return;
+        if (isAndroid) {
+          window.location.href = intentLink;
+          return;
+        }
+        if (isIOS) {
+          var ifr = document.createElement('iframe');
+          ifr.setAttribute('aria-hidden', 'true');
+          ifr.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute';
+          ifr.src = deepLink;
+          document.body.appendChild(ifr);
+          setTimeout(function () {
+            try { document.body.removeChild(ifr); } catch (_) {}
+          }, 2000);
+        }
+      }
+
+      // Si la app está instalada, ábrela al tocar el link (también desde Instagram).
+      // Universal Links (AASA) hacen lo mismo en Safari/Chrome sin mostrar esta página.
+      if (eventId && /^\d+$/.test(String(eventId)) && (isAndroid || isIOS)) {
+        setTimeout(tryOpenInstalledApp, inApp ? 200 : 80);
+      }
+
       if (inApp) {
         body.classList.remove('mode-default');
         body.classList.add('mode-inapp');
@@ -492,35 +525,33 @@
         var link = httpsShareUrl();
 
         if (isAndroid) {
-          // Un toque → Chrome con el mismo link.
           if (stepsIos) stepsIos.classList.add('hidden');
-          headline.textContent = 'Ábrelo fuera de ' + name;
+          headline.textContent = 'Abriendo OWG…';
           lede.textContent =
-            'Un toque abre Chrome con este evento. Ahí sí puedes descargar OWG.';
-          guideLabel.textContent = 'Recomendado';
+            'Si tienes la app, debería abrirse sola. Si no, abre Chrome o descarga OWG.';
+          guideLabel.textContent = '¿No se abrió?';
           openExternalBtn.textContent = 'Abrir en Chrome';
           openExternalBtn.classList.remove('hidden');
           copyBtn.classList.remove('btn-primary');
           copyBtn.classList.add('btn-secondary');
           footnote.textContent =
-            'Si Chrome no responde, usa «Copiar enlace» y pégalo en el navegador.';
+            'Si tienes OWG instalada y no abrió, toca «Abrir en Chrome» y el enlace otra vez.';
           toast.textContent = 'Enlace copiado. Pégalo en Chrome.';
 
           openExternalBtn.addEventListener('click', function () {
             openInExternalBrowser(link);
           });
         } else {
-          // iPhone: no hay forma fiable de abrir Safari; el intento cicla la misma página.
           if (openExternalBtn) openExternalBtn.classList.add('hidden');
-          headline.textContent = 'Casi listo';
+          headline.textContent = 'Abriendo OWG…';
           lede.textContent =
-            'Copia el enlace y ábrelo en Safari, o usa ··· arriba a la derecha.';
-          guideLabel.textContent = 'Cómo continuar';
+            'Si tienes la app, debería abrirse sola. Si no, copia el enlace o usa ··· → Safari.';
+          guideLabel.textContent = '¿No se abrió?';
           step1Desc.textContent = 'Esquina superior derecha de ' + name + '.';
           step2Title.textContent = 'Abrir en Safari';
           step2Desc.textContent = 'Elige “Abrir en Safari” (o “Abrir en el navegador”).';
           footnote.textContent =
-            name + ' en iPhone no permite abrir Safari con un botón. Copiar el enlace es lo más limpio.';
+            'Con OWG instalada suele abrirse sola. Si no, copiar el enlace es lo más limpio en iPhone.';
           toast.textContent = 'Enlace copiado. Pégalo en Safari.';
         }
 
@@ -545,22 +576,12 @@
         return;
       }
 
-      var deepLink = 'owg://evento/' + eventId;
-      var intentLink =
-        'intent://evento/' + eventId +
-        '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
-        encodeURIComponent(storeUrl) + ';end';
+      headline.textContent = 'Abriendo OWG…';
+      lede.textContent = 'Si tienes la app, se abre sola. Si no, descarga abajo.';
 
       openBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        if (isAndroid) {
-          window.location.href = intentLink;
-          return;
-        }
-        var ifr = document.createElement('iframe');
-        ifr.style.display = 'none';
-        ifr.src = deepLink;
-        document.body.appendChild(ifr);
+        tryOpenInstalledApp();
         setTimeout(function () {
           if (document.visibilityState === 'visible') {
             lede.textContent = 'Si no se abrió la app, descarga OWG abajo.';

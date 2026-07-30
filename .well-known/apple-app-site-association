@@ -7,6 +7,8 @@
         "paths": [
           "/auth/callback",
           "/auth/callback/*",
+          "/evento/*",
+          "/evento/index.html",
           "/boletos/*",
           "/boletos/index.html"
         ]
