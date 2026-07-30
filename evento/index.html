@@ -2,90 +2,333 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Abrir evento en OWG…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Evento en OWG</title>
   <meta name="robots" content="noindex">
   <meta property="og:title" content="Evento en OWG">
   <meta property="og:description" content="Carteleras y lucha libre — Official Wrestling Group">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/shared/owg-tokens.css">
-  <link rel="stylesheet" href="/shared/owg-ui.css">
   <style>
-    body.owg-body {
+    :root {
+      --bridge-ink: #f4f0ea;
+      --bridge-muted: rgba(244, 240, 234, 0.62);
+      --bridge-faint: rgba(244, 240, 234, 0.34);
+      --bridge-line: rgba(244, 240, 234, 0.12);
+      --bridge-panel: rgba(18, 14, 16, 0.72);
+      --bridge-step: rgba(255, 255, 255, 0.04);
+      --bridge-red: #e50914;
+      --bridge-gold: #e8c547;
+    }
+
+    * { box-sizing: border-box; }
+
+    body.bridge {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--bridge-ink);
+      background:
+        radial-gradient(120% 80% at 50% -10%, rgba(229, 9, 20, 0.28), transparent 55%),
+        radial-gradient(90% 60% at 100% 100%, rgba(232, 197, 71, 0.08), transparent 45%),
+        linear-gradient(180deg, #1a1012 0%, #0c0b0e 48%, #09080a 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+      -webkit-font-smoothing: antialiased;
     }
-    .owg-card {
-      max-width: 420px;
-      width: 100%;
-      margin-bottom: 0;
+
+    .stage {
+      width: min(100%, 400px);
+      animation: rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .brand {
       text-align: center;
-      padding: 28px 24px;
+      margin-bottom: 28px;
     }
-    .owg-brand-logo {
+
+    .brand img {
       display: block;
-      width: min(160px, 48vw);
+      width: min(148px, 46vw);
       height: auto;
-      margin: 0 auto 12px;
+      margin: 0 auto 10px;
+      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.35));
     }
-    .sub {
-      margin: 0 0 12px;
-      color: var(--owg-text-tertiary);
-      font-size: 13px;
-    }
-    #status {
+
+    .brand-kicker {
       margin: 0;
-      color: var(--owg-text-secondary);
-      line-height: 1.5;
-      font-size: 15px;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--bridge-faint);
+      font-weight: 600;
     }
+
+    .panel {
+      background: var(--bridge-panel);
+      border: 1px solid var(--bridge-line);
+      border-radius: 20px;
+      padding: 28px 22px 22px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 24px 48px rgba(0, 0, 0, 0.35);
+    }
+
+    .headline {
+      margin: 0 0 8px;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(34px, 9vw, 42px);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    .lede {
+      margin: 0 auto 22px;
+      max-width: 28ch;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--bridge-muted);
+      font-weight: 450;
+    }
+
+    /* Modo normal: Abrir / Descargar */
+    .mode-default .guide { display: none; }
+    .mode-inapp .actions-default { display: none; }
+
     .actions {
-      margin-top: 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      align-items: stretch;
     }
-    /* Banner Instagram/FB — HTML en la página (no depende de JS externo). */
-    #inapp-banner {
-      display: none;
-      margin: 0 0 16px;
-      padding: 14px;
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 18px;
       border-radius: 12px;
-      border: 1px solid rgba(229, 9, 20, 0.45);
-      background: rgba(229, 9, 20, 0.12);
-      text-align: left;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
     }
-    #inapp-banner.is-on { display: block; }
-    #inapp-banner strong { display: block; margin-bottom: 6px; font-size: 14px; }
-    #inapp-banner p { margin: 0 0 10px; font-size: 13px; line-height: 1.45; color: var(--owg-text-secondary); }
-    #inapp-copied { display: none; margin: 8px 0 0; font-size: 12px; color: var(--owg-text-secondary); }
-    #inapp-copied.is-on { display: block; }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #f0121c 0%, #a00810 100%);
+      box-shadow: 0 10px 28px rgba(229, 9, 20, 0.28);
+    }
+
+    .btn-secondary {
+      color: var(--bridge-ink);
+      background: transparent;
+      border: 1px solid var(--bridge-line);
+    }
+
+    .btn-ghost {
+      color: var(--bridge-muted);
+      background: transparent;
+      border: none;
+      min-height: 44px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .btn.is-done {
+      background: rgba(76, 175, 80, 0.16);
+      border-color: rgba(76, 175, 80, 0.35);
+      color: #9be7a0;
+      box-shadow: none;
+    }
+
+    /* Guía Instagram — patrón de pasos (Spotify / Linktree style) */
+    .guide-label {
+      margin: 0 0 12px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--bridge-gold);
+    }
+
+    .steps {
+      list-style: none;
+      margin: 0 0 22px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px 12px 12px 10px;
+      border-radius: 14px;
+      background: var(--bridge-step);
+      border: 1px solid var(--bridge-line);
+      text-align: left;
+      animation: rise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .step:nth-child(1) { animation-delay: 80ms; }
+    .step:nth-child(2) { animation-delay: 160ms; }
+    .step:nth-child(3) { animation-delay: 240ms; }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 18px;
+      letter-spacing: 0;
+      color: #fff;
+      background: linear-gradient(145deg, rgba(229, 9, 20, 0.95), rgba(120, 10, 16, 0.9));
+      box-shadow: 0 6px 14px rgba(229, 9, 20, 0.22);
+    }
+
+    .step-title {
+      margin: 2px 0 2px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--bridge-ink);
+    }
+
+    .step-desc {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.4;
+      color: var(--bridge-muted);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      padding: 1px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--bridge-line);
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      vertical-align: middle;
+    }
+
+    .footnote {
+      margin: 16px 0 0;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--bridge-faint);
+    }
+
+    .toast {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #9be7a0;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 220ms ease, transform 220ms ease;
+      pointer-events: none;
+    }
+
+    .toast.is-on {
+      opacity: 1;
+      transform: none;
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
-<body class="owg-body">
-  <div class="owg-card">
-    <div id="inapp-banner">
-      <strong id="inapp-title">Estás dentro de Instagram</strong>
-      <p id="inapp-body">Toca ··· (arriba a la derecha) → Abrir en Safari o Chrome. Ahí sí podrás descargar OWG.</p>
-      <button type="button" id="inapp-copy" class="owg-btn owg-btn--secondary">Copiar enlace de descarga</button>
-      <p id="inapp-copied">Enlace copiado. Ábrelo en Safari o Chrome.</p>
-    </div>
+<body class="bridge mode-default">
+  <main class="stage" id="stage">
+    <header class="brand">
+      <img src="/shared/logo-letras.svg" alt="OWG" width="148" height="68">
+      <p class="brand-kicker">Official Wrestling Group</p>
+    </header>
 
-    <img class="owg-brand-logo" src="/shared/logo-letras.svg" alt="OWG" width="160" height="74">
-    <p class="sub">Official Wrestling Group</p>
-    <p id="status">Elige cómo continuar</p>
-    <div class="actions" id="actions">
-      <a id="open-app" class="owg-btn" href="#">Abrir en OWG</a>
-      <a id="get-app" class="owg-btn owg-btn--secondary" href="https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share">Descargar la app</a>
-    </div>
-    <p class="owg-hint" id="hint">
-      Si ya tienes OWG, úsala. Si no, toca Descargar para ir a la tienda.
-    </p>
-  </div>
+    <section class="panel" aria-labelledby="headline">
+      <h1 class="headline" id="headline">Tu evento te espera</h1>
+      <p class="lede" id="lede">Ábrelo en OWG o descarga la app gratis.</p>
+
+      <!-- Flujo normal (Safari / Chrome) -->
+      <div class="actions actions-default" id="actions-default">
+        <a class="btn btn-primary" id="open-app" href="#">Abrir en OWG</a>
+        <a class="btn btn-secondary" id="get-app" href="https://play.google.com/store/apps/details?id=com.owg.app&pcampaignid=web_share">Descargar la app</a>
+      </div>
+
+      <!-- Flujo Instagram / Facebook / TikTok -->
+      <div class="guide" id="guide">
+        <p class="guide-label" id="guide-label">Un paso más</p>
+        <ol class="steps" id="steps">
+          <li class="step">
+            <span class="step-num" aria-hidden="true">1</span>
+            <div>
+              <p class="step-title">Toca <span class="chip">···</span> arriba</p>
+              <p class="step-desc" id="step1-desc">Esquina superior derecha de Instagram.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num" aria-hidden="true">2</span>
+            <div>
+              <p class="step-title" id="step2-title">Abrir en Safari</p>
+              <p class="step-desc" id="step2-desc">Así sales del navegador interno.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num" aria-hidden="true">3</span>
+            <div>
+              <p class="step-title">Descarga OWG</p>
+              <p class="step-desc">En tu navegador ya funciona la tienda.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="copy-link">Copiar enlace</button>
+          <button type="button" class="btn btn-ghost" id="try-store">Probar abrir la tienda</button>
+        </div>
+        <p class="toast" id="toast" role="status">Enlace copiado. Pégalo en Safari o Chrome.</p>
+        <p class="footnote" id="footnote">
+          Instagram bloquea descargas dentro de su app. No eres tú: es su navegador.
+        </p>
+      </div>
+    </section>
+  </main>
+
   <script src="/owg-app-config.js"></script>
-  <script src="/shared/owg-store.js"></script>
   <script>
     (function () {
       var STORE_IOS = 'https://apps.apple.com/us/app/owg-wrestling-y-lucha-libre/id6780648941';
@@ -98,21 +341,26 @@
       var isIOS = /iPhone|iPad|iPod/i.test(ua);
       var inApp = /Instagram|FBAN|FBAV|FB_IAB|Messenger|Line\/|Twitter|TikTok|Bytedance|Snapchat|LinkedInApp|MicroMessenger/i.test(ua);
       var storeUrl = isIOS ? STORE_IOS : STORE_PLAY;
+      var shareUrl = window.location.href;
 
       var params = new URLSearchParams(window.location.search);
       var fromQuery = params.get('id');
       var fromPath = window.location.pathname.match(/\/evento\/(\d+)/);
       var eventId = fromQuery || (fromPath ? fromPath[1] : null);
 
-      var statusEl = document.getElementById('status');
+      var body = document.body;
+      var headline = document.getElementById('headline');
+      var lede = document.getElementById('lede');
       var openBtn = document.getElementById('open-app');
       var getBtn = document.getElementById('get-app');
-      var hintEl = document.getElementById('hint');
-      var banner = document.getElementById('inapp-banner');
-      var inappTitle = document.getElementById('inapp-title');
-      var inappBody = document.getElementById('inapp-body');
-      var inappCopy = document.getElementById('inapp-copy');
-      var inappCopied = document.getElementById('inapp-copied');
+      var copyBtn = document.getElementById('copy-link');
+      var tryStoreBtn = document.getElementById('try-store');
+      var toast = document.getElementById('toast');
+      var footnote = document.getElementById('footnote');
+      var step1Desc = document.getElementById('step1-desc');
+      var step2Title = document.getElementById('step2-title');
+      var step2Desc = document.getElementById('step2-desc');
+      var guideLabel = document.getElementById('guide-label');
 
       function appName() {
         if (/Instagram/i.test(ua)) return 'Instagram';
@@ -145,49 +393,85 @@
         window.location.assign(storeUrl);
       }
 
+      function copy(text, doneLabel) {
+        function ok() {
+          copyBtn.textContent = doneLabel || 'Enlace copiado';
+          copyBtn.classList.add('is-done');
+          toast.classList.add('is-on');
+          setTimeout(function () {
+            copyBtn.textContent = 'Copiar enlace';
+            copyBtn.classList.remove('is-done');
+          }, 2600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(ok, function () {
+            window.prompt('Copia este enlace:', text);
+          });
+        } else {
+          window.prompt('Copia este enlace:', text);
+          ok();
+        }
+      }
+
       getBtn.href = storeUrl;
       getBtn.addEventListener('click', function (e) {
         e.preventDefault();
         goStore();
       });
 
-      if (inApp) {
-        banner.classList.add('is-on');
-        inappTitle.textContent = 'Estás dentro de ' + appName();
-        inappBody.textContent = isIOS
-          ? 'Toca ··· (arriba a la derecha) → Abrir en Safari. Ahí sí podrás descargar OWG.'
-          : 'Toca ··· (arriba a la derecha) → Abrir en Chrome. Ahí sí podrás descargar OWG.';
-        statusEl.textContent = 'Para instalar OWG, abre esta página en tu navegador.';
-        hintEl.textContent = inappBody.textContent;
-        getBtn.textContent = 'Intentar abrir la tienda';
-
-        inappCopy.addEventListener('click', function () {
-          var text = storeUrl;
-          function ok() {
-            inappCopied.classList.add('is-on');
-            inappCopy.textContent = '¡Enlace copiado!';
-          }
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(ok, function () {
-              window.prompt('Copia este enlace:', text);
-            });
-          } else {
-            window.prompt('Copia este enlace:', text);
-            ok();
-          }
-        });
+      if (params.get('comprar') === '1' || params.has('comprar')) {
+        if (eventId && /^\d+$/.test(String(eventId))) {
+          window.location.replace('/comprar/index.html?id=' + eventId);
+          return;
+        }
       }
 
       if (!eventId || !/^\d+$/.test(String(eventId))) {
-        statusEl.textContent =
-          'Enlace de evento no válido. Comparte de nuevo desde la cartelera OWG.';
-        getBtn.textContent = inApp ? 'Intentar abrir la tienda' : 'Descargar OWG';
-        openBtn.style.display = 'none';
+        headline.textContent = 'Enlace no válido';
+        lede.textContent = 'Pide que te compartan el evento otra vez desde OWG.';
+        openBtn.classList.add('hidden');
+        getBtn.textContent = 'Descargar OWG';
+      }
+
+      if (inApp) {
+        body.classList.remove('mode-default');
+        body.classList.add('mode-inapp');
+
+        var name = appName();
+        headline.textContent = 'Casi listo';
+        lede.textContent =
+          name + ' abre un navegador limitado. En 2 toques sales y ya puedes instalar OWG.';
+        guideLabel.textContent = 'Cómo continuar';
+        step1Desc.textContent = 'Esquina superior derecha de ' + name + '.';
+        if (isIOS) {
+          step2Title.textContent = 'Abrir en Safari';
+          step2Desc.textContent = 'Elige “Abrir en Safari” (o “Abrir en el navegador”).';
+        } else {
+          step2Title.textContent = 'Abrir en Chrome';
+          step2Desc.textContent = 'Elige “Abrir en Chrome” o “Abrir en el navegador”.';
+        }
+        footnote.textContent =
+          name + ' bloquea las tiendas de apps por seguridad. Abrir en el navegador lo resuelve.';
+
+        // Copiar el enlace del evento (mejor UX: al abrirlo fuera, ven el chooser completo).
+        copyBtn.addEventListener('click', function () {
+          copy(shareUrl, 'Enlace copiado');
+        });
+        tryStoreBtn.addEventListener('click', function () {
+          goStore();
+        });
         return;
       }
 
-      if (params.get('comprar') === '1' || params.has('comprar')) {
-        window.location.replace('/comprar/index.html?id=' + eventId);
+      if (!isAndroid && !isIOS) {
+        headline.textContent = 'Ábrelo en el celular';
+        lede.textContent = 'Este enlace está pensado para iPhone o Android con OWG.';
+        openBtn.textContent = 'Ir a owg-app.com';
+        openBtn.href = 'https://owg-app.com';
+        return;
+      }
+
+      if (!eventId || !/^\d+$/.test(String(eventId))) {
         return;
       }
 
@@ -197,26 +481,8 @@
         '#Intent;scheme=owg;package=com.owg.app;S.browser_fallback_url=' +
         encodeURIComponent(storeUrl) + ';end';
 
-      if (!inApp) {
-        statusEl.textContent =
-          '¿Tienes OWG? Ábrela. Si no, descarga la app gratis.';
-      }
-
-      if (!isAndroid && !isIOS) {
-        statusEl.textContent =
-          'Abre este enlace en tu celular para ver la cartelera en OWG.';
-        openBtn.textContent = 'Ir a owg-app.com';
-        openBtn.href = 'https://owg-app.com';
-        return;
-      }
-
-      openBtn.href = '#';
       openBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        if (inApp) {
-          goStore();
-          return;
-        }
         if (isAndroid) {
           window.location.href = intentLink;
           return;
@@ -227,8 +493,7 @@
         document.body.appendChild(ifr);
         setTimeout(function () {
           if (document.visibilityState === 'visible') {
-            statusEl.textContent =
-              'Si no se abrió OWG, toca «Descargar la app».';
+            lede.textContent = 'Si no se abrió la app, descarga OWG abajo.';
           }
         }, 2200);
       });
