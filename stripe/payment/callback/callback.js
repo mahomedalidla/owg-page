@@ -7,14 +7,16 @@
   var status = params.get('status') || 'success';
   var orderId = params.get('order_id') || '';
   var sessionId = params.get('session_id') || '';
+  var accessToken = params.get('t') || params.get('access_token') || '';
   var PENDING_KEY = 'owg_boletaje_pago_pendiente';
 
-  if ((!orderId || !sessionId) && window.localStorage) {
+  if ((!orderId || !sessionId || !accessToken) && window.localStorage) {
     try {
       var pending = JSON.parse(localStorage.getItem(PENDING_KEY) || 'null');
       if (pending) {
         if (!orderId && pending.order_id) orderId = pending.order_id;
         if (!sessionId && pending.session_id) sessionId = pending.session_id;
+        if (!accessToken && pending.access_token) accessToken = pending.access_token;
       }
     } catch (_) {}
   }
@@ -97,7 +99,11 @@
         Authorization: 'Bearer ' + cfg.anonKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ order_id: orderId, session_id: sessionId }),
+      body: JSON.stringify({
+        order_id: orderId,
+        session_id: sessionId,
+        access_token: accessToken,
+      }),
     });
     var body = await res.json();
     if (!res.ok) {
@@ -157,6 +163,7 @@
   function boletosLandingUrl(accion) {
     var q = new URLSearchParams();
     if (orderId) q.set('order', orderId);
+    if (accessToken) q.set('t', accessToken);
     if (accion) q.set('accion', accion);
     if (recoveryEmail) q.set('email', recoveryEmail);
     return '/boletos/index.html?' + q.toString();
@@ -165,6 +172,7 @@
   function deepLink(accion) {
     var q = new URLSearchParams();
     if (orderId) q.set('order', orderId);
+    if (accessToken) q.set('t', accessToken);
     if (accion) q.set('accion', accion);
     if (recoveryEmail) q.set('email', recoveryEmail);
     var suffix = q.toString();
@@ -206,7 +214,7 @@
     show(elLoading);
     setOpenAppLink();
 
-    if (!orderId || !sessionId) {
+    if (!orderId || !sessionId || !accessToken) {
       show(elPending);
       return;
     }

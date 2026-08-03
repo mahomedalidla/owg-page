@@ -296,6 +296,7 @@
           JSON.stringify({
             order_id: body.order_id,
             session_id: body.session_id || '',
+            access_token: body.access_token || '',
             event_title: eventData && eventData.title ? eventData.title : '',
             started_at: new Date().toISOString(),
           })
@@ -367,6 +368,9 @@
         intentLink: intentLink,
         storeUrl: storeUrl,
       });
+      if (Store.isInAppBrowser && Store.isInAppBrowser() && Store.mountInAppHelp) {
+        Store.mountInAppHelp(elChooser, { copyUrl: storeUrl });
+      }
     } else {
       elChooserStore.href = storeUrl;
       elChooserStore.addEventListener('click', function (e) {

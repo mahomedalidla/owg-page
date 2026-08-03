@@ -3,6 +3,7 @@
 
   var params = new URLSearchParams(window.location.search);
   var orderId = params.get('order') || params.get('order_id') || '';
+  var accessToken = params.get('t') || params.get('access_token') || '';
   var emailParam = params.get('email') || '';
 
   var elLoading = document.getElementById('view-loading');
@@ -52,7 +53,7 @@
   }
 
   async function fetchOrder(cfg) {
-    if (!orderId) return null;
+    if (!orderId || !accessToken) return null;
     var fnUrl = cfg.url + '/functions/v1/resumen-orden-boleto-web';
     var res = await fetch(fnUrl, {
       method: 'POST',
@@ -61,7 +62,7 @@
         Authorization: 'Bearer ' + cfg.anonKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ order_id: orderId }),
+      body: JSON.stringify({ order_id: orderId, access_token: accessToken }),
     });
     var body = await res.json();
     if (!res.ok) {
@@ -73,7 +74,7 @@
   async function init() {
     if (pc) pc.initStoreButtons(document);
 
-    if (!orderId) {
+    if (!orderId || !accessToken) {
       show(elPending);
       return;
     }
