@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Descargar OWG — App Store y Play Store</title>
+  <meta name="description" content="Descarga OWG, la app de lucha libre. Te llevamos a App Store o Google Play según tu dispositivo.">
+  <meta name="robots" content="noindex">
+  <meta property="og:title" content="Descargar OWG">
+  <meta property="og:description" content="Disponible en iOS y Android. Un solo enlace a la tienda correcta.">
+  <meta property="og:url" content="https://owg-app.com/descargar">
+  <meta name="theme-color" content="#0F0F12">
+  <link rel="icon" href="/Logo%20Cuadro.png" type="image/png" sizes="any">
+  <link rel="stylesheet" href="/shared/owg-tokens.css">
+  <link rel="stylesheet" href="/shared/owg-ui.css">
+  <style>
+    .dl-wrap {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 28px 16px 40px;
+    }
+    #dl-card h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      text-align: center;
+    }
+    #dl-card .dl-sub {
+      margin: 0 0 20px;
+      text-align: center;
+      color: var(--owg-text-secondary);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .dl-status {
+      margin: 0 0 16px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--owg-text-muted);
+      line-height: 1.4;
+    }
+    .dl-status[hidden] { display: none; }
+    .dl-stores {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .dl-stores .owg-btn--store {
+      flex: 1 1 100%;
+      max-width: none;
+      width: 100%;
+    }
+    .dl-home {
+      display: block;
+      margin-top: 18px;
+      text-align: center;
+      color: var(--owg-text-secondary);
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .dl-home:hover { color: var(--owg-text); }
+  </style>
+</head>
+<body class="owg-body">
+  <div class="dl-wrap">
+    <div class="owg-brand brand">
+      <img class="owg-brand-logo" src="/shared/logo-letras.svg" alt="OWG" width="168" height="78">
+    </div>
+
+    <div id="dl-card" class="owg-card">
+      <h1>Descargar OWG</h1>
+      <p class="dl-sub">La app de lucha libre. Disponible en iOS y Android.</p>
+      <p id="dl-status" class="dl-status" hidden>Abriendo la tienda…</p>
+      <div id="dl-stores" class="dl-stores" hidden>
+        <a id="dl-btn-app-store" class="owg-btn owg-btn--store" href="#">Descargar en App Store</a>
+        <a id="dl-btn-play-store" class="owg-btn owg-btn--store owg-btn--store-alt" href="#">Descargar en Play Store</a>
+      </div>
+    </div>
+
+    <a class="dl-home" href="/">Volver a owg-app.com</a>
+  </div>
+
+  <script src="/owg-app-config.js"></script>
+  <script src="/shared/owg-store.js"></script>
+  <script src="/shared/owg-analytics.js"></script>
+  <script>
+    (function () {
+      var Store = window.OwgStore;
+      var Analytics = window.OwgAnalytics;
+      if (!Store) return;
+
+      var card = document.getElementById('dl-card');
+      var statusEl = document.getElementById('dl-status');
+      var storesEl = document.getElementById('dl-stores');
+      var btnApp = document.getElementById('dl-btn-app-store');
+      var btnPlay = document.getElementById('dl-btn-play-store');
+
+      var platform = Analytics ? Analytics.platform() : 'desktop';
+      var base = Analytics ? Analytics.baseParams() : { platform: platform };
+
+      function track(name, extra, cb) {
+        if (!Analytics) {
+          if (typeof cb === 'function') cb();
+          return;
+        }
+        Analytics.track(name, Object.assign({}, base, extra || {}), cb);
+      }
+
+      function goStore(storeKey, url) {
+        track(
+          'download_store_click',
+          { store: storeKey },
+          function () {
+            Store.goToStore(url);
+          },
+        );
+      }
+
+      Store.mountInAppHelp(card, {
+        copyUrl: location.href.split('#')[0],
+      });
+
+      track('download_intent', { store: platform === 'ios' ? 'app_store' : platform === 'android' ? 'play_store' : 'chooser' });
+
+      btnApp.setAttribute('href', Store.appStoreUrl());
+      btnPlay.setAttribute('href', Store.playStoreUrl());
+
+      btnApp.addEventListener('click', function (e) {
+        e.preventDefault();
+        goStore('app_store', Store.appStoreUrl());
+      });
+      btnPlay.addEventListener('click', function (e) {
+        e.preventDefault();
+        goStore('play_store', Store.playStoreUrl());
+      });
+
+      if (platform === 'ios' || platform === 'android') {
+        statusEl.hidden = false;
+        statusEl.textContent =
+          platform === 'ios'
+            ? 'Te llevamos a App Store…'
+            : 'Te llevamos a Google Play…';
+        storesEl.hidden = false;
+
+        // En in-app browser: no auto-redirect agresivo; el usuario usa el botón / ayuda.
+        if (Store.isInAppBrowser()) {
+          statusEl.textContent = Store.openExternalBrowserHint();
+          return;
+        }
+
+        var storeKey = platform === 'ios' ? 'app_store' : 'play_store';
+        var url = Store.storeUrlForDevice();
+        setTimeout(function () {
+          goStore(storeKey, url);
+        }, 280);
+        return;
+      }
+
+      // Desktop: chooser manual
+      statusEl.hidden = true;
+      storesEl.hidden = false;
+    })();
+  </script>
+</body>
+</html>
