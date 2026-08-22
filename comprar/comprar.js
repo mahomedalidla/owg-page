@@ -15,6 +15,9 @@
   var elEmail = document.getElementById('email');
   var elQty = document.getElementById('quantity');
   var elTotal = document.getElementById('total');
+  var elFace = document.getElementById('face-amount');
+  var elService = document.getElementById('service-amount');
+  var elBreakdown = document.getElementById('breakdown');
   var elSubmit = document.getElementById('submit-btn');
   var elError = document.getElementById('error');
   var elChooserApp = document.getElementById('chooser-app');
@@ -27,6 +30,12 @@
   var eventData = null;
   var selectedTier = null;
   var supabaseCfg = null;
+  var feeConfig = {
+    enabled: true,
+    percent: 5,
+    flat_under: 50,
+    flat_amount: 5,
+  };
   var PENDING_KEY = 'owg_boletaje_pago_pendiente';
 
   function stripQuotes(s) {
@@ -91,8 +100,8 @@
     throw new Error(
       lastMsg ||
         'Supabase no configurado. En Vercel: SUPABASE_URL=https://xxx.supabase.co y ' +
-          'SUPABASE_ANON_KEY (sin comillas). Luego Redeploy.'
-    );
+          'SUPABASE_PUBLISHABLE_KEY (o ANON legacy, sin comillas). Luego Redeploy.'
+        );
   }
 
   function money(n) {
@@ -134,14 +143,69 @@
     return Math.max(Number(tier.capacity) - Number(tier.sold_count || 0), 0);
   }
 
+  function roundMxn(n) {
+    return Math.round(Number(n) * 100) / 100;
+  }
+
+  function comisionOwgUnitaria(unit) {
+    if (!feeConfig.enabled || unit <= 0) return 0;
+    if (unit < feeConfig.flat_under) return roundMxn(feeConfig.flat_amount);
+    if (!(feeConfig.percent > 0)) return 0;
+    return roundMxn(unit * feeConfig.percent / 100);
+  }
+
+  function cotizarCargo(unit, qty) {
+    qty = Math.max(1, qty);
+    unit = Math.max(0, Number(unit) || 0);
+    if (unit <= 0) {
+      return { face: 0, service: 0, total: 0 };
+    }
+    var face = roundMxn(unit * qty);
+    var owg = roundMxn(comisionOwgUnitaria(unit) * qty);
+    var charge = roundMxn((face + owg + 3) / (1 - 0.036));
+    return {
+      face: face,
+      service: roundMxn(charge - face),
+      total: charge,
+    };
+  }
+
+  async function loadFeeConfig() {
+    try {
+      var res = await supabase
+        .from('app_runtime_config')
+        .select('value')
+        .eq('key', 'boletaje_platform_fee')
+        .maybeSingle();
+      var value = res && res.data && res.data.value;
+      if (!value || typeof value !== 'object') return;
+      var percent = Number(value.percent);
+      var under = Number(value.flat_under);
+      var flat = Number(value.flat_amount);
+      feeConfig = {
+        enabled: value.enabled === true,
+        percent: percent > 0 ? percent : 5,
+        flat_under: under > 0 ? under : 50,
+        flat_amount: flat >= 0 ? roundMxn(flat) : 5,
+      };
+    } catch (_) {}
+  }
+
   function updateTotal() {
     if (!selectedTier) {
       elTotal.textContent = money(0);
+      if (elFace) elFace.textContent = money(0);
+      if (elService) elService.textContent = money(0);
+      if (elBreakdown) elBreakdown.hidden = true;
       return;
     }
     var qty = Math.min(10, Math.max(1, parseInt(elQty.value, 10) || 1));
     elQty.value = String(qty);
-    elTotal.textContent = money(Number(selectedTier.price) * qty);
+    var quote = cotizarCargo(Number(selectedTier.price), qty);
+    if (elFace) elFace.textContent = money(quote.face);
+    if (elService) elService.textContent = money(quote.service);
+    if (elBreakdown) elBreakdown.hidden = false;
+    elTotal.textContent = money(quote.total);
   }
 
   function renderTiers(tiers) {
@@ -412,6 +476,7 @@
 
     try {
       await ensureSupabase();
+      await loadFeeConfig();
       await loadEvent();
     } catch (e) {
       elStatus.hidden = false;

@@ -116,6 +116,22 @@
       align-items: flex-end;
     }
     .row .field { flex: 1; }
+    .breakdown {
+      margin: 4px 0 0;
+      padding-top: 8px;
+    }
+    .breakdown__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--owg-text-muted);
+    }
+    .breakdown__row span:last-child {
+      color: var(--owg-text);
+      font-weight: 600;
+    }
     .total {
       display: flex;
       justify-content: space-between;
@@ -223,8 +239,18 @@
           </div>
         </div>
 
+        <div class="breakdown" id="breakdown" hidden>
+          <div class="breakdown__row">
+            <span>Boletos</span>
+            <span id="face-amount">$0.00</span>
+          </div>
+          <div class="breakdown__row">
+            <span>Comisión de servicio</span>
+            <span id="service-amount">$0.00</span>
+          </div>
+        </div>
         <div class="total">
-          <span>Total</span>
+          <span>Total a pagar</span>
           <span id="total">$0.00</span>
         </div>
 
