@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mesa de cartelera · OWG</title>
+  <meta name="robots" content="noindex">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f0f12;
+      --panel: #16161a;
+      --line: #2a2a30;
+      --text: #f2f2f2;
+      --muted: #9a9aa3;
+      --red: #e50914;
+      --gold: #e0b15a;
+      --ok: #4caf50;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    h1 { margin: 0; font-size: 22px; letter-spacing: 0.04em; }
+    p.nota { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    main { display: grid; grid-template-columns: minmax(320px, 440px) 1fr; min-height: calc(100vh - 74px); }
+    section { padding: 16px; }
+    .lista { border-right: 1px solid var(--line); }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+    input, button { font: inherit; }
+    input {
+      width: 100%;
+      background: #131316;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    button {
+      background: var(--red);
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    button.secundario { background: transparent; color: var(--text); border: 1px solid var(--line); }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .fila-acciones { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+    .fila-acciones input[type="search"] { flex: 1; }
+    ul { list-style: none; margin: 12px 0 0; padding: 0; }
+    li {
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    li:hover, li.activo { background: #1e1e22; }
+    li strong { display: block; }
+    li span { color: var(--muted); font-size: 12px; }
+    li .aviso { color: var(--gold); }
+    .vacio, .error { color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .error { color: var(--red); }
+    .ok { color: var(--ok); font-size: 13px; }
+    .tarjeta {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 560px;
+    }
+    .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 860px) {
+      main { grid-template-columns: 1fr; }
+      .lista { border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>MESA DE CARTELERA</h1>
+      <p class="nota">Revisa horarios, fechas y funciones nuevas. La hora es la de este navegador.</p>
+    </div>
+    <button id="btn-salir" class="secundario" hidden type="button">Salir</button>
+  </header>
+  <main>
+    <section class="lista" id="panel-lista" hidden>
+      <div class="fila-acciones">
+        <input id="q" type="search" placeholder="Empresa, título, ciudad o arena" aria-label="Buscar">
+        <button id="btn-buscar" type="button">Buscar</button>
+      </div>
+      <div class="fila-acciones">
+        <label style="margin:0"><input id="chk-revisar" type="checkbox"> Solo por revisar</label>
+        <span id="conteo" class="nota"></span>
+        <button id="btn-nueva" class="secundario" type="button">Nueva función</button>
+      </div>
+      <p id="error-lista" class="error" hidden></p>
+      <ul id="eventos"></ul>
+    </section>
+    <section id="panel-form">
+      <div id="paso-login" class="tarjeta">
+        <h2>Entrar</h2>
+        <p class="nota">Cuenta admin. Desde aquí se pueden crear y corregir funciones.</p>
+        <label for="login-email">Correo</label>
+        <input id="login-email" type="email" autocomplete="username">
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" autocomplete="current-password">
+        <p id="error-login" class="error" hidden></p>
+        <div class="fila-acciones">
+          <button id="btn-entrar" type="button">Entrar</button>
+        </div>
+      </div>
+      <div id="paso-nueva" class="tarjeta" hidden>
+        <h2>Nueva función</h2>
+        <p class="nota">Queda anunciada sin combates. La hora es la de este navegador; en la app cada quien la ve en su zona.</p>
+        <label for="nueva-empresa">Empresa / promotora</label>
+        <input id="nueva-empresa">
+        <label for="nueva-titulo">Título</label>
+        <input id="nueva-titulo">
+        <div class="dos">
+          <div>
+            <label for="nueva-fecha">Fecha</label>
+            <input id="nueva-fecha" type="date">
+          </div>
+          <div>
+            <label for="nueva-hora">Hora</label>
+            <input id="nueva-hora" type="time" value="20:00">
+          </div>
+        </div>
+        <label for="nueva-ciudad">Ciudad</label>
+        <input id="nueva-ciudad">
+        <label for="nueva-arena">Arena</label>
+        <input id="nueva-arena">
+        <label for="nueva-transmision">Transmisión</label>
+        <input id="nueva-transmision">
+        <label for="nueva-boletos">URL de boletos</label>
+        <input id="nueva-boletos">
+        <p id="nueva-msg" class="error" hidden></p>
+        <div class="fila-acciones">
+          <button id="btn-crear" type="button">Crear función</button>
+          <button id="btn-cancelar-nueva" class="secundario" type="button">Cancelar</button>
+        </div>
+      </div>
+      <div id="paso-editar" class="tarjeta" hidden>
+        <h2>Corregir función</h2>
+        <p id="edit-empresa" class="nota"></p>
+        <p id="edit-avisos" class="aviso"></p>
+        <label for="edit-titulo">Título</label>
+        <input id="edit-titulo">
+        <div class="dos">
+          <div>
+            <label for="edit-fecha">Fecha</label>
+            <input id="edit-fecha" type="date">
+          </div>
+          <div>
+            <label for="edit-hora">Hora</label>
+            <input id="edit-hora" type="time">
+          </div>
+        </div>
+        <label for="edit-ciudad">Ciudad</label>
+        <input id="edit-ciudad">
+        <label for="edit-arena">Arena</label>
+        <input id="edit-arena">
+        <label for="edit-transmision">Transmisión</label>
+        <input id="edit-transmision">
+        <label for="edit-boletos">URL de boletos</label>
+        <input id="edit-boletos">
+        <p id="edit-msg" hidden></p>
+        <div class="fila-acciones">
+          <button id="btn-guardar" type="button">Guardar</button>
+        </div>
+      </div>
+      <p id="paso-vacio" class="vacio" hidden>Elige una función de la lista, o pulsa Nueva función.</p>
+    </section>
+  </main>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const $ = (id) => document.getElementById(id);
+    let client = null;
+    let eventos = [];
+    let seleccionado = null;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function rawToLocal(raw) {
+      const m = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+      if (!m) return { fecha: '', hora: '', texto: raw };
+      const utc = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], 0));
+      const fecha = `${utc.getFullYear()}-${pad(utc.getMonth() + 1)}-${pad(utc.getDate())}`;
+      const hora = `${pad(utc.getHours())}:${pad(utc.getMinutes())}`;
+      const texto = utc.toLocaleString('es-MX', {
+        weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+      });
+      return { fecha, hora, texto };
+    }
+
+    function localToRaw(fecha, hora) {
+      const [y, mo, d] = fecha.split('-').map(Number);
+      const [h, mi] = (hora || '00:00').split(':').map(Number);
+      const local = new Date(y, mo - 1, d, h, mi, 0);
+      return `${local.getUTCFullYear()}-${pad(local.getUTCMonth() + 1)}-${pad(local.getUTCDate())}T${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:00`;
+    }
+
+    function avisos(ev) {
+      const local = rawToLocal(ev.event_date);
+      const partes = [];
+      if (ev.cancelado) partes.push('Cancelado');
+      if (local.hora === '00:00') partes.push('Hora 00:00');
+      if (!String(ev.city || '').trim()) partes.push('Sin ciudad');
+      if (!String(ev.venue || '').trim()) partes.push('Sin arena');
+      return partes;
+    }
+
+    function mostrar(id) {
+      for (const paso of ['paso-login', 'paso-nueva', 'paso-editar', 'paso-vacio']) {
+        $(paso).hidden = paso !== id;
+      }
+    }
+
+    function configValida(c) {
+      const url = String(c && c.url || '').trim().replace(/\/$/, '');
+      const anonKey = String(c && (c.anonKey || c.key) || '').trim();
+      if (!url || !anonKey || url.includes('TU_PROYECTO')) return null;
+      if (!/^https?:\/\//i.test(url)) return null;
+      return { url, anonKey };
+    }
+
+    async function cargarConfig() {
+      const inline = configValida(window.OWG_SUPABASE_CONFIG);
+      if (inline) return inline;
+      const res = await fetch('/api/supabase-config');
+      const data = await res.json().catch(() => ({}));
+      const cfg = configValida(data);
+      if (!res.ok || !cfg) {
+        throw new Error(data.message || 'El sitio no tiene la conexión a la base.');
+      }
+      return cfg;
+    }
+
+    async function arranque() {
+      mostrar('paso-login');
+      $('btn-entrar').disabled = true;
+      try {
+        const cfg = await cargarConfig();
+        client = createClient(cfg.url, cfg.anonKey, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+        });
+        const { data } = await client.auth.getSession();
+        $('btn-entrar').disabled = false;
+        if (!data.session) {
+          $('panel-lista').hidden = true;
+          $('btn-salir').hidden = true;
+          return;
+        }
+        await entrarMesa();
+      } catch (e) {
+        $('panel-lista').hidden = true;
+        $('btn-salir').hidden = true;
+        $('btn-entrar').disabled = true;
+        $('error-login').hidden = false;
+        $('error-login').textContent = e instanceof Error ? e.message : 'No se pudo conectar.';
+      }
+    }
+
+    async function entrarMesa() {
+      $('panel-lista').hidden = false;
+      $('btn-salir').hidden = false;
+      mostrar('paso-vacio');
+      await cargar();
+    }
+
+    async function cargar() {
+      $('error-lista').hidden = true;
+      const hoy = new Date();
+      const desde = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() - 1, 0, 0, 0);
+      const hasta = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 22, 0, 0, 0);
+      const q = $('q').value.trim();
+      const { data, error } = await client.rpc('admin_mesa_listar_eventos', {
+        p_desde: localToRaw(
+          `${desde.getFullYear()}-${pad(desde.getMonth() + 1)}-${pad(desde.getDate())}`,
+          '00:00',
+        ),
+        p_hasta: localToRaw(
+          `${hasta.getFullYear()}-${pad(hasta.getMonth() + 1)}-${pad(hasta.getDate())}`,
+          '00:00',
+        ),
+        p_q: q || null,
+      });
+      if (error) {
+        $('error-lista').hidden = false;
+        $('error-lista').textContent = error.message.includes('admin_mesa_listar_eventos')
+          ? 'Falta aplicar la migración 20260968_admin_mesa_cartelera.sql en Supabase.'
+          : error.message;
+        eventos = [];
+      } else {
+        eventos = Array.isArray(data) ? data : [];
+      }
+      pintar();
+    }
+
+    function pintar() {
+      const solo = $('chk-revisar').checked;
+      const visibles = solo ? eventos.filter((e) => avisos(e).length) : eventos;
+      const revisar = eventos.filter((e) => avisos(e).length).length;
+      $('conteo').textContent = `${visibles.length} en lista · ${revisar} por revisar`;
+      $('eventos').replaceChildren(...visibles.map((ev) => {
+        const li = document.createElement('li');
+        if (seleccionado && seleccionado.event_id === ev.event_id) li.className = 'activo';
+        const local = rawToLocal(ev.event_date);
+        const problemas = avisos(ev);
+        li.innerHTML = `<strong></strong><span></span>`;
+        li.querySelector('strong').textContent = ev.event_title || '(sin título)';
+        const extra = [local.texto, ev.promotion_name, ev.city].filter(Boolean).join(' · ');
+        li.querySelector('span').textContent = problemas.length
+          ? `${extra} · ${problemas.join(' · ')}`
+          : extra;
+        if (problemas.length) li.querySelector('span').className = 'aviso';
+        li.addEventListener('click', () => abrirEditar(ev));
+        return li;
+      }));
+    }
+
+    function abrirEditar(ev) {
+      seleccionado = ev;
+      const local = rawToLocal(ev.event_date);
+      $('edit-empresa').textContent = ev.promotion_name || '';
+      $('edit-avisos').textContent = avisos(ev).join(' · ');
+      $('edit-titulo').value = ev.event_title || '';
+      $('edit-fecha').value = local.fecha;
+      $('edit-hora').value = local.hora;
+      $('edit-ciudad').value = ev.city || '';
+      $('edit-arena').value = ev.venue || '';
+      $('edit-transmision').value = ev.broadcast_platform || '';
+      $('edit-boletos').value = ev.ticket_url || '';
+      $('edit-msg').hidden = true;
+      mostrar('paso-editar');
+      pintar();
+    }
+
+    $('btn-entrar').addEventListener('click', async () => {
+      $('error-login').hidden = true;
+      $('btn-entrar').disabled = true;
+      const { error } = await client.auth.signInWithPassword({
+        email: $('login-email').value.trim(),
+        password: $('login-password').value,
+      });
+      $('btn-entrar').disabled = false;
+      if (error) {
+        $('error-login').hidden = false;
+        $('error-login').textContent = error.message;
+        return;
+      }
+      await entrarMesa();
+    });
+
+    $('btn-salir').addEventListener('click', async () => {
+      await client.auth.signOut();
+      seleccionado = null;
+      $('panel-lista').hidden = true;
+      $('btn-salir').hidden = true;
+      mostrar('paso-login');
+    });
+
+    $('btn-buscar').addEventListener('click', cargar);
+    $('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') cargar(); });
+    $('chk-revisar').addEventListener('change', pintar);
+
+    $('btn-nueva').addEventListener('click', () => {
+      seleccionado = null;
+      $('nueva-msg').hidden = true;
+      const hoy = new Date();
+      $('nueva-fecha').value = `${hoy.getFullYear()}-${pad(hoy.getMonth() + 1)}-${pad(hoy.getDate())}`;
+      mostrar('paso-nueva');
+      pintar();
+    });
+    $('btn-cancelar-nueva').addEventListener('click', () => mostrar('paso-vacio'));
+
+    $('btn-crear').addEventListener('click', async () => {
+      const msg = $('nueva-msg');
+      msg.hidden = true;
+      const empresa = $('nueva-empresa').value.trim();
+      const titulo = $('nueva-titulo').value.trim();
+      if (!empresa || !titulo || !$('nueva-fecha').value) {
+        msg.hidden = false;
+        msg.textContent = 'Empresa, título y fecha son obligatorios.';
+        return;
+      }
+      $('btn-crear').disabled = true;
+      const { error } = await client.rpc('admin_crear_evento_sin_combates', {
+        p_promotion_name: empresa,
+        p_event_title: titulo,
+        p_event_date: localToRaw($('nueva-fecha').value, $('nueva-hora').value),
+        p_venue: $('nueva-arena').value.trim(),
+        p_city: $('nueva-ciudad').value.trim(),
+        p_broadcast_platform: $('nueva-transmision').value.trim(),
+        p_ticket_url: $('nueva-boletos').value.trim(),
+        p_stream_url: '',
+      });
+      $('btn-crear').disabled = false;
+      if (error) {
+        msg.hidden = false;
+        msg.textContent = error.message;
+        return;
+      }
+      $('nueva-empresa').value = '';
+      $('nueva-titulo').value = '';
+      $('nueva-ciudad').value = '';
+      $('nueva-arena').value = '';
+      $('nueva-transmision').value = '';
+      $('nueva-boletos').value = '';
+      mostrar('paso-vacio');
+      await cargar();
+    });
+
+    $('btn-guardar').addEventListener('click', async () => {
+      if (!seleccionado) return;
+      const msg = $('edit-msg');
+      msg.hidden = true;
+      $('btn-guardar').disabled = true;
+      const { error } = await client.rpc('admin_actualizar_evento', {
+        p_event_id: seleccionado.event_id,
+        p_title: $('edit-titulo').value.trim(),
+        p_event_date: localToRaw($('edit-fecha').value, $('edit-hora').value),
+        p_venue: $('edit-arena').value.trim(),
+        p_city: $('edit-ciudad').value.trim(),
+        p_broadcast_platform: $('edit-transmision').value.trim(),
+        p_ticket_url: $('edit-boletos').value.trim(),
+        p_stream_url: null,
+        p_cagematch_url: null,
+        p_is_cartelera_completa: seleccionado.is_cartelera_completa,
+        p_whatsapp_url: null,
+      });
+      $('btn-guardar').disabled = false;
+      msg.hidden = false;
+      msg.className = error ? 'error' : 'ok';
+      msg.textContent = error ? error.message : 'Función actualizada.';
+      if (!error) {
+        const id = seleccionado.event_id;
+        await cargar();
+        const fresco = eventos.find((e) => e.event_id === id);
+        if (fresco) abrirEditar(fresco);
+      }
+    });
+
+    arranque();
+  </script>
+</body>
+</html>
