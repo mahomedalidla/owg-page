@@ -57,6 +57,7 @@
       cursor: pointer;
     }
     button.secundario { background: transparent; color: var(--text); border: 1px solid var(--line); }
+    button.peligro { background: transparent; color: var(--red); border: 1px solid var(--red); }
     button:disabled { opacity: 0.5; cursor: default; }
     .fila-acciones { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
     .fila-acciones input[type="search"] { flex: 1; }
@@ -180,6 +181,7 @@
         <p id="edit-msg" hidden></p>
         <div class="fila-acciones">
           <button id="btn-guardar" type="button">Guardar</button>
+          <button id="btn-eliminar" class="peligro" type="button">Eliminar función</button>
         </div>
         <h3>Combates</h3>
         <p id="combates-estado" class="nota"></p>
@@ -602,6 +604,30 @@
         const fresco = eventos.find((e) => e.event_id === id);
         if (fresco) abrirEditar(fresco);
       }
+    });
+
+    $('btn-eliminar').addEventListener('click', async () => {
+      if (!seleccionado) return;
+      const titulo = seleccionado.event_title || 'esta función';
+      const ok = window.confirm(
+        `¿Eliminar "${titulo}"? También se borran sus combates. No se puede deshacer.`,
+      );
+      if (!ok) return;
+      $('btn-eliminar').disabled = true;
+      const { error } = await client.rpc('admin_eliminar_evento', {
+        p_event_id: seleccionado.event_id,
+      });
+      $('btn-eliminar').disabled = false;
+      const msg = $('edit-msg');
+      if (error) {
+        msg.hidden = false;
+        msg.className = 'error';
+        msg.textContent = error.message;
+        return;
+      }
+      seleccionado = null;
+      mostrar('paso-vacio');
+      await cargar();
     });
 
     $('btn-combate-nuevo').addEventListener('click', () => abrirCombate(null));
