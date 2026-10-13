@@ -39,7 +39,7 @@
     .lista { border-right: 1px solid var(--line); }
     label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
     input, button { font: inherit; }
-    input {
+    input, textarea {
       width: 100%;
       background: #131316;
       color: var(--text);
@@ -47,6 +47,7 @@
       border-radius: 8px;
       padding: 8px 10px;
     }
+    textarea { resize: vertical; }
     button {
       background: var(--red);
       color: white;
@@ -180,6 +181,25 @@
         <div class="fila-acciones">
           <button id="btn-guardar" type="button">Guardar</button>
         </div>
+        <h3>Combates</h3>
+        <p id="combates-estado" class="nota"></p>
+        <ul id="combates"></ul>
+        <div id="combate-form" hidden>
+          <label for="combate-tipo">Tipo</label>
+          <input id="combate-tipo" value="Singles Match">
+          <label for="combate-titulo">Campeonato, si aplica</label>
+          <input id="combate-titulo">
+          <div id="combate-bandos"></div>
+          <p id="combate-msg" class="error" hidden></p>
+          <div class="fila-acciones">
+            <button id="btn-combate-otro" class="secundario" type="button">Otro bando</button>
+            <button id="btn-combate-guardar" type="button">Guardar combate</button>
+            <button id="btn-combate-cancelar" class="secundario" type="button">Cancelar</button>
+          </div>
+        </div>
+        <div class="fila-acciones">
+          <button id="btn-combate-nuevo" class="secundario" type="button">Agregar combate</button>
+        </div>
       </div>
       <p id="paso-vacio" class="vacio" hidden>Elige una función de la lista, o pulsa Nueva función.</p>
     </section>
@@ -191,6 +211,9 @@
     let client = null;
     let eventos = [];
     let seleccionado = null;
+    let luchas = [];
+    let combateEditId = null;
+    const marcas = new Map();
 
     function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -264,6 +287,13 @@
           $('btn-salir').hidden = true;
           return;
         }
+        const permitido = await client.rpc('fn_es_admin');
+        if (permitido.error || permitido.data !== true) {
+          await client.auth.signOut();
+          $('error-login').hidden = false;
+          $('error-login').textContent = 'Esta cuenta no puede administrar la cartelera.';
+          return;
+        }
         await entrarMesa();
       } catch (e) {
         $('panel-lista').hidden = true;
@@ -332,6 +362,116 @@
       }));
     }
 
+    function textoLucha(lucha) {
+      const lados = [];
+      for (const bando of lucha.bandos || []) {
+        const nombres = (bando.luchadores || [])
+          .map((l) => String(l.name || '').trim())
+          .filter((n) => n && n !== 'Desconocido');
+        if (nombres.length) lados.push(nombres.join(' y '));
+      }
+      const tipo = String(lucha.championship_title || lucha.match_type || 'Combate').trim();
+      return lados.length ? `${tipo} · ${lados.join(' vs ')}` : tipo;
+    }
+
+    function pintarCombates() {
+      $('combates').replaceChildren(...luchas.map((lucha, i) => {
+        const li = document.createElement('li');
+        const titulo = document.createElement('strong');
+        titulo.textContent = `${i + 1}. ${textoLucha(lucha)}`;
+        const acciones = document.createElement('div');
+        acciones.className = 'fila-acciones';
+        const editar = document.createElement('button');
+        editar.type = 'button';
+        editar.className = 'secundario';
+        editar.textContent = 'Modificar';
+        editar.addEventListener('click', () => abrirCombate(lucha));
+        const borrar = document.createElement('button');
+        borrar.type = 'button';
+        borrar.className = 'secundario';
+        borrar.textContent = 'Quitar';
+        borrar.addEventListener('click', () => quitarCombate(lucha));
+        acciones.append(editar, borrar);
+        li.append(titulo, acciones);
+        return li;
+      }));
+    }
+
+    function agregarCajaBando(team, nombres) {
+      const label = document.createElement('label');
+      label.textContent = `Bando ${team}, un nombre por línea`;
+      const area = document.createElement('textarea');
+      area.rows = 3;
+      area.dataset.team = String(team);
+      area.value = (nombres || []).join('\n');
+      $('combate-bandos').append(label, area);
+    }
+
+    function abrirCombate(lucha) {
+      combateEditId = lucha ? lucha.match_id : null;
+      marcas.clear();
+      $('combate-tipo').value = lucha?.match_type || 'Singles Match';
+      $('combate-titulo').value = lucha?.championship_title || '';
+      $('combate-msg').hidden = true;
+      $('combate-bandos').replaceChildren();
+      const porTeam = new Map();
+      for (const bando of lucha?.bandos || []) {
+        const team = Number(bando.team_number) || 1;
+        if (!porTeam.has(team)) porTeam.set(team, []);
+        for (const persona of bando.luchadores || []) {
+          const name = String(persona.name || '').trim();
+          if (!name || name === 'Desconocido') continue;
+          porTeam.get(team).push(name);
+          const id = Number(persona.id) || 0;
+          if (id > 0) marcas.set(name.toLowerCase(), id);
+        }
+      }
+      const teams = porTeam.size ? [...porTeam.keys()].sort((a, b) => a - b) : [1, 2];
+      for (const team of teams) agregarCajaBando(team, porTeam.get(team) || []);
+      $('combate-form').hidden = false;
+      $('btn-combate-guardar').textContent = lucha ? 'Guardar combate' : 'Agregar combate';
+    }
+
+    function participantesDelFormulario() {
+      const out = [];
+      for (const area of $('combate-bandos').querySelectorAll('textarea')) {
+        const team = Number(area.dataset.team) || 1;
+        for (const name of area.value.split('\n').map((s) => s.trim()).filter(Boolean)) {
+          const fila = { name, team };
+          const id = marcas.get(name.toLowerCase());
+          if (id) fila.character_brand_id = id;
+          out.push(fila);
+        }
+      }
+      return out;
+    }
+
+    async function cargarCombates(eventId) {
+      $('combates-estado').textContent = 'Cargando combates…';
+      luchas = [];
+      pintarCombates();
+      const { data, error } = await client.rpc('get_detalle_evento_v1', { p_event_id: eventId });
+      if (error) {
+        $('combates-estado').textContent = error.message;
+        return;
+      }
+      luchas = Array.isArray(data && data.luchas) ? data.luchas : [];
+      $('combates-estado').textContent = luchas.length ? '' : 'Esta función todavía no tiene combates.';
+      pintarCombates();
+    }
+
+    async function quitarCombate(lucha) {
+      const ok = window.confirm('¿Quitar este combate de la función?');
+      if (!ok || !seleccionado) return;
+      const { error } = await client.rpc('admin_eliminar_combate', { p_match_id: lucha.match_id });
+      if (error) {
+        $('combates-estado').textContent = error.message;
+        return;
+      }
+      $('combate-form').hidden = true;
+      await cargarCombates(seleccionado.event_id);
+    }
+
     function abrirEditar(ev) {
       seleccionado = ev;
       const local = rawToLocal(ev.event_date);
@@ -345,8 +485,10 @@
       $('edit-transmision').value = ev.broadcast_platform || '';
       $('edit-boletos').value = ev.ticket_url || '';
       $('edit-msg').hidden = true;
+      $('combate-form').hidden = true;
       mostrar('paso-editar');
       pintar();
+      cargarCombates(ev.event_id);
     }
 
     $('btn-entrar').addEventListener('click', async () => {
@@ -356,10 +498,18 @@
         email: $('login-email').value.trim(),
         password: $('login-password').value,
       });
-      $('btn-entrar').disabled = false;
       if (error) {
+        $('btn-entrar').disabled = false;
         $('error-login').hidden = false;
         $('error-login').textContent = error.message;
+        return;
+      }
+      const permitido = await client.rpc('fn_es_admin');
+      $('btn-entrar').disabled = false;
+      if (permitido.error || permitido.data !== true) {
+        await client.auth.signOut();
+        $('error-login').hidden = false;
+        $('error-login').textContent = 'Esta cuenta no puede administrar la cartelera.';
         return;
       }
       await entrarMesa();
@@ -452,6 +602,43 @@
         const fresco = eventos.find((e) => e.event_id === id);
         if (fresco) abrirEditar(fresco);
       }
+    });
+
+    $('btn-combate-nuevo').addEventListener('click', () => abrirCombate(null));
+    $('btn-combate-cancelar').addEventListener('click', () => { $('combate-form').hidden = true; });
+    $('btn-combate-otro').addEventListener('click', () => {
+      const areas = $('combate-bandos').querySelectorAll('textarea');
+      const ultimo = areas.length ? Number(areas[areas.length - 1].dataset.team) || areas.length : 0;
+      agregarCajaBando(ultimo + 1, []);
+    });
+    $('btn-combate-guardar').addEventListener('click', async () => {
+      if (!seleccionado) return;
+      const msg = $('combate-msg');
+      msg.hidden = true;
+      const participantes = participantesDelFormulario();
+      if (!participantes.length) {
+        msg.hidden = false;
+        msg.textContent = 'Escribe al menos un luchador.';
+        return;
+      }
+      $('btn-combate-guardar').disabled = true;
+      const params = {
+        p_match_type: $('combate-tipo').value.trim() || 'Singles Match',
+        p_championship_title: $('combate-titulo').value.trim(),
+        p_participants: participantes,
+      };
+      const llamada = combateEditId
+        ? client.rpc('admin_actualizar_combate', { ...params, p_match_id: combateEditId })
+        : client.rpc('admin_agregar_combate', { ...params, p_event_id: seleccionado.event_id });
+      const { error } = await llamada;
+      $('btn-combate-guardar').disabled = false;
+      if (error) {
+        msg.hidden = false;
+        msg.textContent = error.message;
+        return;
+      }
+      $('combate-form').hidden = true;
+      await cargarCombates(seleccionado.event_id);
     });
 
     arranque();
