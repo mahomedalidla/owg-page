@@ -156,8 +156,9 @@
       </div>
       <div id="paso-editar" class="tarjeta" hidden>
         <h2>Corregir función</h2>
-        <p id="edit-empresa" class="nota"></p>
         <p id="edit-avisos" class="aviso"></p>
+        <label for="edit-empresa">Empresa dueña</label>
+        <input id="edit-empresa">
         <label for="edit-titulo">Título</label>
         <input id="edit-titulo">
         <div class="dos">
@@ -477,7 +478,7 @@
     function abrirEditar(ev) {
       seleccionado = ev;
       const local = rawToLocal(ev.event_date);
-      $('edit-empresa').textContent = ev.promotion_name || '';
+      $('edit-empresa').value = ev.promotion_name || '';
       $('edit-avisos').textContent = avisos(ev).join(' · ');
       $('edit-titulo').value = ev.event_title || '';
       $('edit-fecha').value = local.fecha;
@@ -581,7 +582,15 @@
       const msg = $('edit-msg');
       msg.hidden = true;
       $('btn-guardar').disabled = true;
-      const { error } = await client.rpc('admin_actualizar_evento', {
+      const empresa = $('edit-empresa').value.trim();
+      if (!empresa) {
+        $('btn-guardar').disabled = false;
+        msg.hidden = false;
+        msg.className = 'error';
+        msg.textContent = 'La empresa es obligatoria.';
+        return;
+      }
+      const guardado = await client.rpc('admin_actualizar_evento', {
         p_event_id: seleccionado.event_id,
         p_title: $('edit-titulo').value.trim(),
         p_event_date: localToRaw($('edit-fecha').value, $('edit-hora').value),
@@ -594,6 +603,14 @@
         p_is_cartelera_completa: seleccionado.is_cartelera_completa,
         p_whatsapp_url: null,
       });
+      let error = guardado.error;
+      if (!error) {
+        const duena = await client.rpc('admin_cambiar_empresa_evento', {
+          p_event_id: seleccionado.event_id,
+          p_promotion_name: empresa,
+        });
+        error = duena.error;
+      }
       $('btn-guardar').disabled = false;
       msg.hidden = false;
       msg.className = error ? 'error' : 'ok';
