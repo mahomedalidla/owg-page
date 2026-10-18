@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ubicaciones · OWG</title>
+  <meta name="robots" content="noindex">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f0f12;
+      --panel: #16161a;
+      --line: #2a2a30;
+      --text: #f2f2f2;
+      --muted: #9a9aa3;
+      --red: #e50914;
+      --ok: #4caf50;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    h1 { margin: 0; font-size: 22px; letter-spacing: 0.04em; }
+    p.nota { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    main { display: grid; grid-template-columns: minmax(320px, 440px) 1fr; min-height: calc(100vh - 74px); }
+    section { padding: 16px; }
+    .lista { border-right: 1px solid var(--line); }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+    input, button, a.boton { font: inherit; }
+    input {
+      width: 100%;
+      background: #131316;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    button, a.boton {
+      background: var(--red);
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    button.secundario, a.boton.secundario {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .fila-acciones { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+    .fila-acciones input[type="search"] { flex: 1; }
+    ul { list-style: none; margin: 12px 0 0; padding: 0; }
+    li { padding: 10px; border-radius: 8px; cursor: pointer; }
+    li:hover, li.activo { background: #1e1e22; }
+    li strong { display: block; }
+    li span { color: var(--muted); font-size: 12px; }
+    .error { color: var(--red); font-size: 13px; }
+    .ok { color: var(--ok); font-size: 13px; }
+    .tarjeta {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 640px;
+    }
+    .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    iframe { width: 100%; height: 280px; border: 0; border-radius: 8px; margin-top: 12px; background: #111; }
+    @media (max-width: 860px) {
+      main { grid-template-columns: 1fr; }
+      .lista { border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>UBICACIONES</h1>
+      <p class="nota">Confirma la arena. Una vez vale para todas las funciones de ese lugar.</p>
+    </div>
+    <button id="btn-salir" class="secundario" hidden type="button">Salir</button>
+  </header>
+  <main>
+    <section class="lista" id="panel-lista" hidden>
+      <div class="fila-acciones">
+        <input id="q" type="search" placeholder="Arena, ciudad, función o empresa" aria-label="Buscar">
+        <button id="btn-buscar" type="button">Buscar</button>
+      </div>
+      <p id="conteo" class="nota"></p>
+      <p id="error-lista" class="error" hidden></p>
+      <ul id="arenas"></ul>
+    </section>
+    <section>
+      <div id="paso-login" class="tarjeta">
+        <h2>Entrar</h2>
+        <p class="nota">Cuenta admin. Aquí solo se confirman arenas y coordenadas.</p>
+        <label for="login-email">Correo</label>
+        <input id="login-email" type="email" autocomplete="username">
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" autocomplete="current-password">
+        <p id="error-login" class="error" hidden></p>
+        <div class="fila-acciones">
+          <button id="btn-entrar" type="button">Entrar</button>
+        </div>
+      </div>
+      <div id="paso-vacio" class="tarjeta" hidden>
+        <p class="nota">Elige una arena de la lista.</p>
+      </div>
+      <div id="paso-editar" class="tarjeta" hidden>
+        <h2 id="edit-arena"></h2>
+        <p id="edit-detalle" class="nota"></p>
+        <div class="fila-acciones">
+          <a id="btn-maps" class="boton secundario" target="_blank" rel="noopener">Abrir en Google Maps</a>
+        </div>
+        <label for="edit-pega">Pega el enlace de Maps o las coordenadas</label>
+        <input id="edit-pega" placeholder="https://www.google.com/maps/... o 19.4326, -99.1332">
+        <div class="dos">
+          <div>
+            <label for="edit-lat">Latitud</label>
+            <input id="edit-lat" inputmode="decimal">
+          </div>
+          <div>
+            <label for="edit-lng">Longitud</label>
+            <input id="edit-lng" inputmode="decimal">
+          </div>
+        </div>
+        <p id="edit-msg" hidden></p>
+        <div class="fila-acciones">
+          <button id="btn-confirmar" type="button">Confirmar ubicación</button>
+        </div>
+        <iframe id="mapa" hidden title="Vista de la coordenada"></iframe>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const $ = (id) => document.getElementById(id);
+    let client = null;
+    let arenas = [];
+    let seleccion = null;
+
+    function mostrar(id) {
+      for (const paso of ['paso-login', 'paso-vacio', 'paso-editar']) {
+        $(paso).hidden = paso !== id;
+      }
+    }
+
+    function configValida(c) {
+      const url = String(c && c.url || '').trim().replace(/\/$/, '');
+      const anonKey = String(c && (c.anonKey || c.key) || '').trim();
+      if (!url || !anonKey || url.includes('TU_PROYECTO')) return null;
+      if (!/^https?:\/\//i.test(url)) return null;
+      return { url, anonKey };
+    }
+
+    async function cargarConfig() {
+      const inline = configValida(window.OWG_SUPABASE_CONFIG);
+      if (inline) return inline;
+      const res = await fetch('/api/supabase-config');
+      const data = await res.json().catch(() => ({}));
+      const cfg = configValida(data);
+      if (!res.ok || !cfg) {
+        throw new Error(data.message || 'El sitio no tiene la conexión a la base.');
+      }
+      return cfg;
+    }
+
+    function validar(lat, lng) {
+      const la = Number(lat);
+      const ln = Number(lng);
+      if (!Number.isFinite(la) || !Number.isFinite(ln)) return null;
+      if (la < -90 || la > 90 || ln < -180 || ln > 180) return null;
+      if (Math.abs(la) < 0.000001 && Math.abs(ln) < 0.000001) return null;
+      return { lat: la, lng: ln };
+    }
+
+    function coordsDesdeTexto(raw) {
+      const t = String(raw || '');
+      const pares = [
+        /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
+        /@(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/,
+        /\[null,null,(-?\d+\.\d+),(-?\d+\.\d+)\]/,
+        /(?:[?&](?:ll|q|query|destination|center)=)(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/i,
+        /earth\.google\.com\/web\/@(-?\d+\.\d+),(-?\d+\.\d+)/,
+        /(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/,
+      ];
+      for (const re of pares) {
+        const m = t.match(re);
+        if (!m) continue;
+        const v = validar(m[1], m[2]);
+        if (v) return v;
+      }
+      return null;
+    }
+
+    function consulta(item) {
+      return [item.venue, item.city].map((s) => String(s || '').trim()).filter(Boolean).join(', ');
+    }
+
+    function pintar() {
+      $('arenas').replaceChildren(...arenas.map((item) => {
+        const li = document.createElement('li');
+        if (seleccion && seleccion.event_id === item.event_id) li.className = 'activo';
+        const fuerte = document.createElement('strong');
+        fuerte.textContent = consulta(item) || item.event_title || 'Arena';
+        const extra = document.createElement('span');
+        const n = Number(item.eventos_misma_arena) || 1;
+        extra.textContent = [
+          item.event_title,
+          item.promotion_name,
+          n === 1 ? '1 función' : `${n} funciones`,
+        ].filter(Boolean).join(' · ');
+        li.append(fuerte, extra);
+        li.addEventListener('click', () => abrir(item));
+        return li;
+      }));
+    }
+
+    function refrescarMapa() {
+      const v = validar($('edit-lat').value, $('edit-lng').value);
+      const mapa = $('mapa');
+      if (!v) {
+        mapa.hidden = true;
+        mapa.removeAttribute('src');
+        return;
+      }
+      const d = 0.01;
+      const bbox = [v.lng - d, v.lat - d, v.lng + d, v.lat + d].join(',');
+      mapa.src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${v.lat},${v.lng}`;
+      mapa.hidden = false;
+    }
+
+    function abrir(item) {
+      seleccion = item;
+      $('edit-arena').textContent = consulta(item) || 'Arena';
+      const n = Number(item.eventos_misma_arena) || 1;
+      $('edit-detalle').textContent = [
+        item.event_title,
+        item.promotion_name,
+        n === 1 ? 'Al confirmar se guarda esta función.' : `Al confirmar se guardan las ${n} funciones de esta arena.`,
+      ].filter(Boolean).join(' · ');
+      $('btn-maps').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta(item) || item.event_title || '')}`;
+      $('edit-pega').value = '';
+      $('edit-lat').value = item.latitude ?? '';
+      $('edit-lng').value = item.longitude ?? '';
+      $('edit-msg').hidden = true;
+      mostrar('paso-editar');
+      pintar();
+      refrescarMapa();
+    }
+
+    async function cargar() {
+      $('error-lista').hidden = true;
+      const q = $('q').value.trim();
+      const { data, error } = await client.rpc('admin_listar_eventos_ubicacion_pendiente', {
+        p_limite: 200,
+        p_busqueda: q || null,
+      });
+      if (error) {
+        $('error-lista').hidden = false;
+        $('error-lista').textContent = error.message;
+        arenas = [];
+      } else {
+        arenas = Array.isArray(data) ? data : [];
+      }
+      let total = arenas.length;
+      const conteo = await client.rpc('admin_contar_arenas_ubicacion_pendiente');
+      if (!conteo.error && Number.isFinite(Number(conteo.data))) total = Number(conteo.data);
+      $('conteo').textContent = q
+        ? `${arenas.length} en esta búsqueda · ${total} arenas pendientes`
+        : `${total} arenas pendientes`;
+      pintar();
+    }
+
+    async function entrar() {
+      $('panel-lista').hidden = false;
+      $('btn-salir').hidden = false;
+      mostrar('paso-vacio');
+      await cargar();
+    }
+
+    async function sesionValida() {
+      const permitido = await client.rpc('fn_es_admin');
+      if (permitido.error || permitido.data !== true) {
+        await client.auth.signOut();
+        $('error-login').hidden = false;
+        $('error-login').textContent = 'Esta cuenta no puede confirmar ubicaciones.';
+        return false;
+      }
+      return true;
+    }
+
+    async function arranque() {
+      mostrar('paso-login');
+      $('btn-entrar').disabled = true;
+      try {
+        const cfg = await cargarConfig();
+        client = createClient(cfg.url, cfg.anonKey, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+        });
+        const { data } = await client.auth.getSession();
+        $('btn-entrar').disabled = false;
+        if (!data.session) return;
+        if (await sesionValida()) await entrar();
+      } catch (e) {
+        $('btn-entrar').disabled = true;
+        $('error-login').hidden = false;
+        $('error-login').textContent = e instanceof Error ? e.message : 'No se pudo conectar.';
+      }
+    }
+
+    $('btn-entrar').addEventListener('click', async () => {
+      $('error-login').hidden = true;
+      $('btn-entrar').disabled = true;
+      const { error } = await client.auth.signInWithPassword({
+        email: $('login-email').value.trim(),
+        password: $('login-password').value,
+      });
+      if (error) {
+        $('btn-entrar').disabled = false;
+        $('error-login').hidden = false;
+        $('error-login').textContent = error.message;
+        return;
+      }
+      $('btn-entrar').disabled = false;
+      if (await sesionValida()) await entrar();
+    });
+
+    $('btn-salir').addEventListener('click', async () => {
+      await client.auth.signOut();
+      seleccion = null;
+      $('panel-lista').hidden = true;
+      $('btn-salir').hidden = true;
+      mostrar('paso-login');
+    });
+
+    $('btn-buscar').addEventListener('click', cargar);
+    $('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') cargar(); });
+
+    $('edit-pega').addEventListener('input', () => {
+      const v = coordsDesdeTexto($('edit-pega').value);
+      if (!v) return;
+      $('edit-lat').value = String(v.lat);
+      $('edit-lng').value = String(v.lng);
+      refrescarMapa();
+    });
+    $('edit-lat').addEventListener('input', refrescarMapa);
+    $('edit-lng').addEventListener('input', refrescarMapa);
+
+    $('btn-confirmar').addEventListener('click', async () => {
+      if (!seleccion) return;
+      const msg = $('edit-msg');
+      const v = validar($('edit-lat').value, $('edit-lng').value);
+      if (!v) {
+        msg.hidden = false;
+        msg.className = 'error';
+        msg.textContent = 'Faltan coordenadas válidas. Pega el enlace largo de Maps o escribe latitud y longitud.';
+        return;
+      }
+      $('btn-confirmar').disabled = true;
+      const { data, error } = await client.rpc('admin_actualizar_ubicacion_evento', {
+        p_event_id: seleccion.event_id,
+        p_latitude: v.lat,
+        p_longitude: v.lng,
+        p_location_verified: true,
+      });
+      $('btn-confirmar').disabled = false;
+      if (error) {
+        msg.hidden = false;
+        msg.className = 'error';
+        msg.textContent = error.message;
+        return;
+      }
+      const n = Number(data && data.eventos_actualizados) || 1;
+      msg.hidden = false;
+      msg.className = 'ok';
+      msg.textContent = n === 1
+        ? 'Ubicación confirmada.'
+        : `Ubicación confirmada en ${n} funciones de esta arena.`;
+      seleccion = null;
+      await cargar();
+      mostrar('paso-vacio');
+    });
+
+    arranque();
+  </script>
+</body>
+</html>
